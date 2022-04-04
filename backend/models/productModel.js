@@ -10,19 +10,24 @@ const ProductSchema = new mongoose.Schema(
     category_id: {
       type: mongoose.Types.ObjectId,
       ref: "Category",
-      default: "micellaneous",
+      default: null,
     },
     shop_id: {
       type: mongoose.Types.ObjectId,
       ref: "Shop",
       default: null,
     },
+    image: [
+      {
+        type: String,
+      },
+    ],
   },
   {
     timestamps: true,
   }
 );
 
-const Order = mongoose.model("Category", ProductSchema);
+const Product = mongoose.model("Product", ProductSchema);
 
-module.exports = Order;
+module.exports = Product;

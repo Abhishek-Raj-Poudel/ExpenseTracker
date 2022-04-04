@@ -6,7 +6,12 @@ const ShopSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    parent_id: [
+    address: {
+      type: String,
+      required: true,
+    },
+
+    product_id: [
       {
         type: mongoose.Types.ObjectId,
         ref: "Product",
