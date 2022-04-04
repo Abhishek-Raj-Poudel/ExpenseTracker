@@ -27,14 +27,21 @@ const OrderSchema = new mongoose.Schema(
     ],
     total_price: {
       type: Number,
-      required,
+      required: true,
     },
+    recept_images: [
+      {
+        type: String,
+        default: null,
+      },
+    ],
+    paid: { type: Boolean, required: true },
   },
   {
     timestamps: true,
   }
 );
 
-const Order = mongoose.model("Category", OrderSchema);
+const Order = mongoose.model("Order", OrderSchema);
 
 module.exports = Order;

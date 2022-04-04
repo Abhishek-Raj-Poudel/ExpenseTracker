@@ -16,12 +16,14 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    image: {
-      type: String,
-    },
+    image: [
+      {
+        type: String,
+      },
+    ],
 
     is_admin: {
-      type: String,
+      type: Boolean,
       default: false,
     },
     gender: {
@@ -30,7 +32,13 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["client", "accountant", "Head", "Designer"],
+      enum: ["client", "accountant", "Head", "Designer", "Staff"],
+      default: "staff",
+    },
+    shop_id: {
+      type: mongoose.Types.ObjectId,
+      ref: "Shop",
+      default: null,
     },
   },
   { timestamps: true }
