@@ -19,6 +19,7 @@ const UserSchema = new mongoose.Schema(
     image: [
       {
         type: String,
+        default: null,
       },
     ],
 
@@ -32,8 +33,8 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["client", "accountant", "Head", "Designer", "Staff"],
-      default: "staff",
+      enum: ["Client", "Accountant", "Head", "Designer", "Staff"],
+      default: "Staff",
     },
     shop_id: {
       type: mongoose.Types.ObjectId,
