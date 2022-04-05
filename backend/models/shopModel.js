@@ -10,7 +10,6 @@ const ShopSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     product_id: [
       {
         type: mongoose.Types.ObjectId,
@@ -20,7 +19,7 @@ const ShopSchema = new mongoose.Schema(
     ],
     service: {
       type: String,
-      default: "service",
+      default: "Service",
     },
   },
   {

@@ -8,7 +8,6 @@ const orderRoute = require("./orderRoute");
 const categoryRoute = require("./categoryRoute");
 const adminRoute = require("./adminRoute");
 const authRoute = require("./authRoute");
-
 const isLoggedIn = require("../middleware/isLoggedIn");
 const isAdmin = require("../middleware/isAdmin");
 
@@ -16,9 +15,9 @@ router.use("/auth", authRoute);
 
 router.use("/admin", [isLoggedIn, isAdmin], adminRoute);
 
-router.use("/category", categoryRoute);
-router.use("/order", orderRoute);
-router.use("/product", productRoute);
+router.use("/category", [isLoggedIn], categoryRoute);
+router.use("/order", [isLoggedIn], orderRoute);
+router.use("/product", [isLoggedIn], productRoute);
 router.use("/shop", shopRoute);
 router.use("/user", userRoute);
 
