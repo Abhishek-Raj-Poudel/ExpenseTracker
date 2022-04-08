@@ -1,19 +1,19 @@
 var createError = require("http-errors");
 var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
+const cors = require("cors");
+var api_routes = require("./routes/apiRoute");
 
-var apiRoute = require("./routes/apiRoute");
 var app = express();
+app.use(cors());
 
 require("./db_init");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use("/assets", express.static(process.cwd() + "/public"));
 
-app.use("/api", apiRoute);
+//mount all routes
+app.use("/api", api_routes); //chaal challan
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -25,14 +25,13 @@ app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
-
+  console.log("err msg " + err.message);
   // render the error page
   res.status(err.status || 500);
-  console.error(err.message);
   res.json({
     data: null,
-    status: 500,
-    msg: err,
+    status: 200,
+    msg: err.message,
   });
 });
 

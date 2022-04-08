@@ -8,7 +8,6 @@ const ShopSchema = new mongoose.Schema(
     },
     address: {
       type: String,
-      required: true,
     },
     product_id: [
       {
