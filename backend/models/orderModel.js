@@ -12,7 +12,7 @@ const OrderSchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
-    product_name: [
+    products_name: [
       {
         type: String,
         required: true,

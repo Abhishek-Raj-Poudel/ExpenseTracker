@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../Inputs/inputs";
 import { HttpClient } from "../../utils/httpClients";
@@ -63,6 +63,13 @@ export default function Login() {
       });
   };
 
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("token");
+    if (loggedIn) {
+      navigate("/user");
+    }
+  });
+
   return (
     <>
       <Input
@@ -84,4 +91,14 @@ export default function Login() {
       </button>
     </>
   );
+}
+
+export function Logout() {
+  const navigate = useNavigate();
+  localStorage.clear();
+  useEffect(() => {
+    navigate("/login");
+  });
+
+  return null;
 }

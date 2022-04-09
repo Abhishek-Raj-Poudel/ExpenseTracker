@@ -16,6 +16,13 @@ const ShopSchema = new mongoose.Schema(
         default: null,
       },
     ],
+    product_id: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+        default: null,
+      },
+    ],
     service: {
       type: String,
       default: "Service",
