@@ -8,12 +8,9 @@ import {
 } from "react-router-dom";
 import Login, { Logout } from "./Components/Login/Login";
 import Register from "./Components/Register/Register";
-import UserLayout from "./Components/User/UserLayout";
-import Dashboard from "./Components/User/Dashboard";
 import Layout from "./Components/Layout";
-import Orders from "./Components/User/Orders";
-import Users from "./Components/User/Users";
-import CashFlow from "./Components/User/CashFlow";
+
+import * as User from "./Components/User/index";
 
 const token = "token";
 function PrivateRoute({ children }) {
@@ -33,7 +30,7 @@ export default function AppRouting() {
           path="/user"
           element={
             <PrivateRoute>
-              <UserLayout></UserLayout>
+              <User.UserLayout></User.UserLayout>
             </PrivateRoute>
           }
         >
@@ -41,7 +38,7 @@ export default function AppRouting() {
             index
             element={
               <PrivateRoute>
-                <Dashboard></Dashboard>
+                <User.Dashboard></User.Dashboard>
               </PrivateRoute>
             }
           />
@@ -49,7 +46,7 @@ export default function AppRouting() {
             path="users"
             element={
               <PrivateRoute>
-                <Users></Users>
+                <User.Users></User.Users>
               </PrivateRoute>
             }
           />
@@ -57,7 +54,23 @@ export default function AppRouting() {
             path="orders"
             element={
               <PrivateRoute>
-                <Orders></Orders>
+                <User.Orders></User.Orders>
+              </PrivateRoute>
+            }
+          ></Route>
+          <Route
+            path="orders/create"
+            element={
+              <PrivateRoute>
+                <User.OrdersCreate></User.OrdersCreate>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="orders/edit=:id"
+            element={
+              <PrivateRoute>
+                <User.OrdersCreate></User.OrdersCreate>
               </PrivateRoute>
             }
           />
@@ -65,7 +78,7 @@ export default function AppRouting() {
             path="cashflow"
             element={
               <PrivateRoute>
-                <CashFlow></CashFlow>
+                <User.CashFlow></User.CashFlow>
               </PrivateRoute>
             }
           />
