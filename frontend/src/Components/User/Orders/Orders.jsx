@@ -10,10 +10,6 @@ export default function Orders() {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    // axios.get(`${process.env.REACT_APP_BASE_URL}/order`, {
-    //   "Access-Control-Allow-Origin": "*",
-    //   Authorization: localStorage.getItem("token"),
-    // })
     http
       .getItem(`order`, { headers: { Authorization: `${token}` } })
       .then((response) => {
@@ -54,7 +50,7 @@ export default function Orders() {
       <h1>
         Welcome to Your Order List
         <NavLink to="create">
-          <FaPlus /> Add User
+          <FaPlus /> Add Order
         </NavLink>
       </h1>
 

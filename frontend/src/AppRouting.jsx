@@ -30,10 +30,11 @@ export default function AppRouting() {
           path="/user"
           element={
             <PrivateRoute>
-              <User.UserLayout></User.UserLayout>
+              <User.UserMain></User.UserMain>
             </PrivateRoute>
           }
         >
+          {/* Dashboard */}
           <Route
             index
             element={
@@ -42,6 +43,7 @@ export default function AppRouting() {
               </PrivateRoute>
             }
           />
+          {/* All Users */}
           <Route
             path="users"
             element={
@@ -50,6 +52,23 @@ export default function AppRouting() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="users/create"
+            element={
+              <PrivateRoute>
+                <User.OrdersCreate></User.OrdersCreate>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="users/edit=:id"
+            element={
+              <PrivateRoute>
+                <User.OrdersEdit></User.OrdersEdit>
+              </PrivateRoute>
+            }
+          />
+          {/* All Orders */}
           <Route
             path="orders"
             element={
@@ -70,10 +89,11 @@ export default function AppRouting() {
             path="orders/edit=:id"
             element={
               <PrivateRoute>
-                <User.OrdersCreate></User.OrdersCreate>
+                <User.OrdersEdit></User.OrdersEdit>
               </PrivateRoute>
             }
           />
+          {/* All CashFlow */}
           <Route
             path="cashflow"
             element={
