@@ -20,90 +20,46 @@ export default function Register() {
   const [userValueError, setUserValueError] = useState(commonUserFields);
   const [officeValue, setOfficeValue] = useState(commonOfficeFields);
   const [officeValueError, setOfficeValueError] = useState(commonOfficeFields);
-  const [isSubmit, setIsSubmit] = useState(true);
+  const [canSubmit, setCanSubmit] = useState(false);
+  const [canOfficeSubmit, setCanOfficeSubmit] = useState(false);
 
   const navigate = useNavigate();
 
   const http = new HttpClient();
 
-  console.log("env", process.env.REACT_APP_BASE_URL);
-
   const handleUserChange = (event) => {
     const { name, value } = event.target;
     setUserValue({ ...userValue, [name]: value });
+    setUserValueError(validate(userValue));
   };
+
   const handleOfficeChange = (event) => {
     const { name, value } = event.target;
     setOfficeValue({ ...officeValue, [name]: value });
+    setOfficeValueError(officeFormValidate(officeValue));
   };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     setUserValueError(validate(userValue));
+    console.log(userValueError);
     setOfficeValueError(officeFormValidate(officeValue));
-    console.log("User", userValue);
-    console.log("Office", officeValue);
-    setIsSubmit(false);
-  };
-
-  useEffect(() => {
-    console.log("isSubmit ", isSubmit);
+    console.log(officeValueError);
     if (
       Object.keys(officeValueError).length === 0 &&
-      Object.keys(userValueError).length === 0 &&
-      !isSubmit
+      Object.keys(userValueError).length === 0
     ) {
-      http
-        .postItem("shop", officeValue, {
-          "Access-Control-Allow-Origin": "*",
-          "content-type": "application/json",
-        })
-        .then((response) => {
-          if (response.data.data === 200) {
-            // success(response.data.msg);
-            console.log(response.data.msg);
-          } else {
-            // error(response.data.msg);
-            console.log(response.data.msg);
-          }
-          // console.log('response: ', response)
-        })
-        .catch((error) => {
-          console.log("Error: ", error.msg);
-        });
-      http
-        .postItem("user", userValue, {
-          "Access-Control-Allow-Origin": "*",
-          "content-type": "application/json",
-        })
-        .then((response) => {
-          if (response.data.data === 200) {
-            // success(response.data.msg);
-            console.log(response.data.msg);
-            setIsSubmit(true);
-            navigate("/login");
-
-            localStorage.setItem("register_success", true);
-            navigate("/login");
-          } else {
-            // error(response.data.msg);
-            console.log(response.data.msg);
-          }
-          // console.log('response: ', response)
-        })
-        .catch((error) => {
-          console.log("Error: ", error);
-        });
+      uploadForm();
     } else {
       console.log(
         "Not Ready To UPload because ",
         "user error=",
         Object.keys(userValueError).length,
         "Office error = ",
-        Object.keys(officeValueError).length,
-        isSubmit
+        Object.keys(officeValueError).length
       );
     }
-  });
+  };
 
   const validate = (values) => {
     const errors = {};
@@ -134,6 +90,7 @@ export default function Register() {
     }
     return errors;
   };
+
   const officeFormValidate = (values) => {
     const errors = {};
     if (!values.name) {
@@ -145,6 +102,88 @@ export default function Register() {
     return errors;
   };
 
+  const uploadForm = () => {
+    http
+      .postItem("shop", officeValue, {
+        "Access-Control-Allow-Origin": "*",
+        "content-type": "application/json",
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          setUserValue({ ...userValue, shop_id: response.data.data._id });
+          console.log("User Value ", userValue);
+          console.log("Shop data Uploaded ", response.data.data);
+          setCanSubmit(true);
+          // success(response.data.msg);
+        } else {
+          // error(response.data.msg);
+          console.log(response.data.msg);
+        }
+      })
+      .catch((error) => {
+        console.log("Error: ", error.msg);
+      });
+  };
+  useEffect(() => {
+    if (canSubmit) {
+      http
+        .postItem("user", userValue, {
+          "Access-Control-Allow-Origin": "*",
+          "content-type": "application/json",
+        })
+        .then((response) => {
+          if (response.data.status === 200) {
+            setOfficeValue({
+              ...officeValue,
+              user_id: [response.data.data._id],
+            });
+
+            console.log("Shop Value ", officeValue);
+            console.log("User Value Uploaded ", response.data);
+            setCanSubmit(false);
+            setCanOfficeSubmit(true);
+            // localStorage.setItem("register_success", true);
+            // navigate("/login");
+          } else {
+            // error(response.data.msg);
+            console.log(response.data.msg);
+            setCanSubmit(false);
+          }
+        })
+        .catch((error) => {
+          console.log("Error: ", error);
+          setCanSubmit(false);
+        });
+    } else {
+      console.log("cant submit because canSubmit is ", canSubmit);
+    }
+
+    if (canOfficeSubmit) {
+      console.log("User data ", userValue);
+      console.log("shop data ", officeValue);
+      http
+        .updateItem(`shop/${userValue.shop_id}`, officeValue, true)
+        .then((response) => {
+          if (response.data.status === 200) {
+            // setUserValue({ ...officeValue, user_id: [response.data.data._id] });
+            console.log("User Value updated ", response.data.data);
+            setCanOfficeSubmit(false);
+            // localStorage.setItem("register_success", true);
+            navigate("/login");
+          } else {
+            // error(response.data.msg);
+            console.log(response.data.msg);
+            setCanOfficeSubmit(false);
+          }
+        })
+        .catch((error) => {
+          console.log("Error: ", error);
+          setCanOfficeSubmit(false);
+        });
+    } else {
+      console.log("cant submit office because canSubmit is ", canOfficeSubmit);
+    }
+  }, [canSubmit, canOfficeSubmit]);
   return (
     <>
       <h1>Register a User and office</h1>

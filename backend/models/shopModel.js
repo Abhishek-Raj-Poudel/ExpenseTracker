@@ -16,7 +16,7 @@ const ShopSchema = new mongoose.Schema(
         default: null,
       },
     ],
-    product_id: [
+    user_id: [
       {
         type: mongoose.Types.ObjectId,
         ref: "User",

@@ -14,8 +14,6 @@ export default function Login() {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    console.log(email);
-    console.log(password);
     if (name === "email") {
       if (!(value && value.includes("@") && value.includes(".com"))) {
         setEmailErr("Invalid Email format");
@@ -52,7 +50,10 @@ export default function Login() {
       )
       .then((response) => {
         if (response.data.data) {
+          const { _id, name, role, image, shop_id } = response.data.data.user;
+          const userValue = { _id, name, role, image, shop_id };
           localStorage.setItem("token", response.data.data.token);
+          localStorage.setItem("user_value", JSON.stringify(userValue));
           navigate("/user");
         } else {
           console.log("User Not Found 😭");
