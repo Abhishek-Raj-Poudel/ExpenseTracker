@@ -1,9 +1,16 @@
 import React from "react";
+import styled from "styled-components";
+
+const InputStyle = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
 
 export function Input({ name, label, type, required, handleChange }) {
   // console.log("handleChange", handleChange);
   return (
-    <>
+    <InputStyle>
       <label>{label}</label>{" "}
       <input
         name={name}
@@ -12,7 +19,7 @@ export function Input({ name, label, type, required, handleChange }) {
         placeholder={`Enter your ${label}`}
         required={required}
       />
-    </>
+    </InputStyle>
   );
 }
 export function Select({ label, name, parentId, options, required }) {

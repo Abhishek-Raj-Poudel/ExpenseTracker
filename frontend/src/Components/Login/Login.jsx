@@ -3,6 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "../Inputs/inputs";
 import { HttpClient } from "../../utils/httpClients";
 
+// styled components
+import Form from "../../Styles/Form";
+import Flexbox from "../../Styles/Flexbox";
+import { TextDanger } from "../../Styles/Texts";
+
 export default function Login() {
   const [email, setEmail] = useState();
   const [emailErr, setEmailErr] = useState();
@@ -72,25 +77,30 @@ export default function Login() {
   });
 
   return (
-    <>
-      <Input
-        label="Email"
-        name="email"
-        handleChange={handleChange}
-        required={true}
-      ></Input>{" "}
-      <span className="text-danger">{emailErr}</span>{" "}
-      <Input
-        label="Password"
-        name="password"
-        handleChange={handleChange}
-        required={true}
-      ></Input>{" "}
-      <span className="text-danger">{passwordErr}</span>{" "}
-      <button type="submit" onClick={handleSubmit}>
-        Submit
-      </button>
-    </>
+    <Flexbox column align="center">
+      <h2>Login</h2>
+      <Flexbox>
+        <Form>
+          <Input
+            label="Email"
+            name="email"
+            handleChange={handleChange}
+            required={true}
+          ></Input>{" "}
+          <TextDanger className="text-danger">{emailErr}</TextDanger>{" "}
+          <Input
+            label="Password"
+            name="password"
+            handleChange={handleChange}
+            required={true}
+          ></Input>{" "}
+          <TextDanger className="text-danger">{passwordErr}</TextDanger>{" "}
+          <button type="submit" onClick={handleSubmit}>
+            Submit
+          </button>
+        </Form>
+      </Flexbox>
+    </Flexbox>
   );
 }
 

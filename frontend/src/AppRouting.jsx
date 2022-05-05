@@ -56,7 +56,7 @@ export default function AppRouting() {
             path="users/create"
             element={
               <PrivateRoute>
-                <User.OrdersCreate></User.OrdersCreate>
+                <User.UserCreate></User.UserCreate>
               </PrivateRoute>
             }
           />
@@ -64,7 +64,7 @@ export default function AppRouting() {
             path="users/edit=:id"
             element={
               <PrivateRoute>
-                <User.OrdersEdit></User.OrdersEdit>
+                <User.UserEdit></User.UserEdit>
               </PrivateRoute>
             }
           />

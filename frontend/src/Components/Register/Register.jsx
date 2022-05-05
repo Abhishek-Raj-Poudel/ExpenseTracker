@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { connect } from "react-redux";
 import { Input } from "../Inputs/inputs";
 import { HttpClient } from "../../utils/httpClients";
 
-export default function Register() {
+// style
+import Card from "../../Styles/Form";
+import Flexbox from "../../Styles/Flexbox";
+import { TextDanger } from "../../Styles/Texts";
+
+function Register() {
   const commonUserFields = {
     name: "",
     email: "",
     password: "",
     re_password: "",
     gender: "",
-    role: "",
+    role: "Head",
   };
   const commonOfficeFields = {
     name: "",
@@ -185,68 +191,96 @@ export default function Register() {
     }
   }, [canSubmit, canOfficeSubmit]);
   return (
-    <>
-      <h1>Register a User and office</h1>
-      <h3>User's Detail</h3>
-      <Input
-        label="Name"
-        name="name"
-        handleChange={handleUserChange}
-      ></Input>{" "}
-      <span className="text-danger">{userValueError.name}</span>{" "}
-      <Input
-        label="Email"
-        name="email"
-        handleChange={handleUserChange}
-        required={true}
-      ></Input>{" "}
-      <span className="text-danger">{userValueError.email}</span>{" "}
-      <Input
-        label="Password"
-        name="password"
-        handleChange={handleUserChange}
-        required={true}
-      ></Input>{" "}
-      <span className="text-danger">{userValueError.password}</span>{" "}
-      <Input
-        label="Re-Password"
-        name="re_password"
-        type="password"
-        handleChange={handleUserChange}
-        required={true}
-      ></Input>{" "}
-      <span className="text-danger">{userValueError.re_password}</span>{" "}
-      <label>Gender</label>{" "}
-      <select name="gender" type="gender" onChange={handleUserChange}>
-        <option value="">--Select A Gender--</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-        <option value="Other">Other</option>
-      </select>{" "}
-      <span className="text-danger">{userValueError.gender}</span>{" "}
-      <h3>User's Office</h3>
-      <Input
-        label="Office Name"
-        name="name"
-        handleChange={handleOfficeChange}
-        required={true}
-      ></Input>{" "}
-      <span className="text-danger">{officeValueError.name}</span>{" "}
-      <label>Role</label>{" "}
-      <select name="role" type="role" onChange={handleUserChange}>
-        <option value="">--Select A Role--</option>
-        <option value="Head">Head</option>
-      </select>{" "}
-      <span className="text-danger">{officeValueError.role}</span>{" "}
-      <Input
-        label="Service"
-        name="service"
-        handleChange={handleOfficeChange}
-      ></Input>{" "}
-      <span className="text-danger">{officeValueError.service}</span>{" "}
-      <button type="submit" onClick={handleSubmit}>
-        Submit
-      </button>
-    </>
+    <Flexbox column align="center">
+      <Flexbox>
+        <Card>
+          <h2>Register </h2>
+          <h3>User's Detail</h3>
+          <Input
+            label="Name"
+            name="name"
+            handleChange={handleUserChange}
+          ></Input>
+          <TextDanger className="text-danger">{userValueError.name}</TextDanger>
+          <Input
+            label="Email"
+            name="email"
+            handleChange={handleUserChange}
+            required={true}
+          ></Input>
+          <TextDanger className="text-danger">
+            {userValueError.email}
+          </TextDanger>
+          <Input
+            label="Password"
+            name="password"
+            handleChange={handleUserChange}
+            required={true}
+          ></Input>
+          <TextDanger className="text-danger">
+            {userValueError.password}
+          </TextDanger>
+          <Input
+            label="Re-Password"
+            name="re_password"
+            type="password"
+            handleChange={handleUserChange}
+            required={true}
+          ></Input>
+          <TextDanger className="text-danger">
+            {userValueError.re_password}
+          </TextDanger>
+          <label>Gender</label>
+          <select name="gender" type="gender" onChange={handleUserChange}>
+            <option value="">--Select A Gender--</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+          <TextDanger className="text-danger">
+            {userValueError.gender}
+          </TextDanger>
+
+          <h3>User's Office</h3>
+
+          <Input
+            label="Office Name"
+            name="name"
+            handleChange={handleOfficeChange}
+            required={true}
+          ></Input>
+          <TextDanger className="text-danger">
+            {officeValueError.name}
+          </TextDanger>
+
+          <Input
+            label="Service"
+            name="service"
+            handleChange={handleOfficeChange}
+          ></Input>
+          <TextDanger className="text-danger">
+            {officeValueError.service}
+          </TextDanger>
+
+          <button type="submit" onClick={handleSubmit}>
+            Submit
+          </button>
+        </Card>
+      </Flexbox>
+    </Flexbox>
   );
 }
+
+const mapStateToProps = (state) => {
+  return {
+    userData: state.user,
+    officeDate: state.office,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    fetchUsers: () => dispatch(),
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Register);

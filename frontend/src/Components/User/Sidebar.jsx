@@ -33,7 +33,7 @@ export default function Sidebar() {
         <li className="nav-item">
           <NavLink className="nav-link" to="/logout">
             <i className="fas fa-fw fa-tachometer-alt"></i>
-            <span>Logout</span>
+            <button>Logout</button>
           </NavLink>
         </li>
       </ul>

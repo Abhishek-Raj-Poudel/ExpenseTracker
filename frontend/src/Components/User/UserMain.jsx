@@ -7,13 +7,11 @@ export default function UserLayout() {
   const [shop, setShop] = useState();
   const [user, setUser] = useState({});
   const [loadShopData, setLoadShopData] = useState(false);
-  // setUser(JSON.parse(localStorage.getItem("user_value")));
   const http = new HttpClient();
 
   useEffect(() => {
     if (!loadShopData) {
       setUser(JSON.parse(localStorage.getItem("user_value")));
-      console.log("UserValue= ", user);
       setLoadShopData(true);
     }
   }, []);

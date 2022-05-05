@@ -7,21 +7,24 @@ export default function Users() {
   const [shop, setShop] = useOutletContext();
   let [allUsers, setAllUsers] = useState([]);
   const http = new HttpClient();
-
+  let allUserArr = [...allUsers];
   useEffect(() => {
     if (shop) {
       shop.user_id.map((obj) => {
         http
           .getItemById(`user/${obj}`)
           .then((response) => {
+            console.log(shop.user_id);
             let responseValue = response.data.data;
+
             if (!responseValue) {
               // Add Toast Notification
               console.log("No user found 😥");
             }
-            return setAllUsers([responseValue]);
-            // setIsLoading(false);
-            console.log("All Users ", allUsers);
+            allUserArr.push(responseValue);
+            console.log("All Users array ", allUserArr);
+            setAllUsers(allUserArr);
+            console.log(allUsers);
           })
           .catch((error) => {
             //Maybe add toast Notification.
@@ -50,12 +53,14 @@ export default function Users() {
 
   return (
     <>
-      <h1>
+      <h2>
         Welcome to Your Order List
         <NavLink to="create">
-          <FaPlus /> Add User
+          <button>
+            <FaPlus /> Add User
+          </button>
         </NavLink>
-      </h1>
+      </h2>
       <table>
         <thead>
           <tr>
@@ -79,15 +84,19 @@ export default function Users() {
               <td>{obj.role}</td>
               <td>{obj._id}</td>
               <td>
-                <NavLink to={`edit=${obj._id}`}>
-                  <FaPen></FaPen>
-                </NavLink>{" "}
+                <button>
+                  <NavLink to={`edit=${obj._id}`}>
+                    <FaPen></FaPen>
+                    Edit
+                  </NavLink>
+                </button>{" "}
                 <button
                   onClick={(event) => {
                     return deleteItem(obj._id);
                   }}
                 >
                   <FaTrash></FaTrash>
+                  Delete
                 </button>
               </td>
             </tr>
