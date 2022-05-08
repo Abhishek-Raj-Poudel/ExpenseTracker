@@ -1,14 +1,14 @@
 import styled from "styled-components";
 
-const Form = styled.div`
+const Card = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: ${(props) => (props.align ? props.align : "flex-start")};
+  align-items: ${(props) => (props.align ? props.align : "center")};
   background-color: ${({ theme }) => theme.colour.cards};
   color: ${({ theme }) => theme.colour.bodyText};
   gap: 14px;
-  padding: 8px 1rem 2rem 1rem;
+  padding: 1rem;
   border-radius: 0.5rem;
 `;
 
-export default Form;
+export default Card;

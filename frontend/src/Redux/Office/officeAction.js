@@ -3,37 +3,20 @@ import {
   FETCH_OFFICE_SUCCESS,
   FETCH_OFFICE_FALIURE,
 } from "./officeType";
-export const fetchUoserRequest = () => {
+export const fetchOfficeRequest = () => {
   return {
     type: FETCH_OFFICE_REQUEST,
   };
 };
-export const fetchUserSuccess = (responseData) => {
+export const fetchOfficeSuccess = (responseData) => {
   return {
     type: FETCH_OFFICE_SUCCESS,
     payload: responseData,
   };
 };
-export const fetchUserFaliure = (errorMsg) => {
+export const fetchOfficeFaliure = (errorMsg) => {
   return {
     type: FETCH_OFFICE_FALIURE,
     payload: errorMsg,
-  };
-};
-export const postUserFaliure = (errorMsg) => {
-  return {
-    type: FETCH_OFFICE_FALIURE,
-    payload: errorMsg,
-  };
-};
-export const postUoserRequest = () => {
-  return {
-    type: FETCH_OFFICE_REQUEST,
-  };
-};
-export const postUserSuccess = (responseData) => {
-  return {
-    type: FETCH_OFFICE_SUCCESS,
-    payload: responseData,
   };
 };

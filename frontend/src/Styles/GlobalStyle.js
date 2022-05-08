@@ -41,6 +41,19 @@ a{
   color:${({ theme }) => theme.colour.link}
 }
 
+table, th, td {
+  padding :1rem;
+  
+}
+
+
+table{
+  width:100%;
+}
+
+th{
+  text-align:left;
+}
 button { 
   
   background-color:${({ theme }) => theme.colour.primary};
@@ -54,10 +67,10 @@ button {
   font-weight:700;
 }
 
-input{
+input, select{
   background-color:${({ theme }) => theme.colour.inputField};
   font-size:14px;
-  width:320px;
+  min-width:320px;
   border:none;
   padding:14px;
   border-radius:8px;

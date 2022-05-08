@@ -6,12 +6,10 @@ import {
 
 const initialState = {
   loading: false,
+  id: "",
   name: "",
-  email: "",
-  password: "",
-  re_password: "",
-  gender: "",
-  role: "Head",
+  role: "",
+  shop_id: "",
   error: "",
 };
 
@@ -26,9 +24,10 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        user_id: action.payload._id,
-        user: action.payload.name,
-        user_role: action.payload.role,
+        id: action.payload._id,
+        name: action.payload.name,
+        role: action.payload.role,
+        shop_id: action.payload.shop_id,
         error: "",
       };
     case FETCH_USERS_FAILURE:

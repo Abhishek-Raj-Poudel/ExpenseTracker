@@ -1,9 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Flexbox from "../../Styles/Flexbox";
 import NavbarStyled from "../../Styles/NavbarStyled";
+import { connect } from "react-redux";
+import {
+  changeToDarkTheme,
+  changeToLightTheme,
+} from "../../Redux/Theme/themeAction";
+import ThemeButton from "../Utilities/ThemeButton";
 
-export default function Navbar() {
+function Navbar({ theme, lightMode, darkMode }) {
   return (
     <nav>
       <NavbarStyled>
@@ -21,9 +26,11 @@ export default function Navbar() {
           </Link>
         </li>
         <li>
-          <button></button>
+          <ThemeButton></ThemeButton>
         </li>
       </NavbarStyled>
     </nav>
   );
 }
+
+export default Navbar;

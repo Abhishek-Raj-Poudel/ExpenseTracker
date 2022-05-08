@@ -2,6 +2,17 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../Inputs/inputs";
 import { HttpClient } from "../../utils/httpClients";
+// redux
+import { useSelector, useDispatch } from "react-redux";
+import {
+  fetchUserRequest,
+  fetchUserSuccess,
+  fetchUserFaliure,
+} from "../../Redux/User/userAction";
+import {
+  fetchOfficeSuccess,
+  fetchOfficeFaliure,
+} from "../../Redux/Office/officeAction";
 
 // styled components
 import Form from "../../Styles/Form";
@@ -13,9 +24,15 @@ export default function Login() {
   const [emailErr, setEmailErr] = useState();
   const [password, setPassword] = useState();
   const [passwordErr, setPasswordErr] = useState();
+
   const navigate = useNavigate();
 
   const http = new HttpClient();
+
+  const dispatch = useDispatch();
+  const shop_id = useSelector((state) => state.user.shop_id);
+
+  let userValue;
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -41,6 +58,7 @@ export default function Login() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    dispatch(fetchUserRequest);
     http
       .postItem(
         "auth",
@@ -49,30 +67,57 @@ export default function Login() {
           password: password,
         },
         {
-          // "Access-Control-Allow-Origin": "*",
           "content-type": "application/json",
         }
       )
       .then((response) => {
         if (response.data.data) {
-          const { _id, name, role, image, shop_id } = response.data.data.user;
-          const userValue = { _id, name, role, image, shop_id };
+          const { _id, name, role, shop_id } = response.data.data.user;
+          userValue = { _id, name, role, shop_id };
           localStorage.setItem("token", response.data.data.token);
+          localStorage.setItem("user_id", _id);
           localStorage.setItem("user_value", JSON.stringify(userValue));
-          navigate("/user");
+          dispatch(fetchUserSuccess(userValue));
+          getOffice();
+          // navigate("/user");
         } else {
-          console.log("User Not Found 😭");
+          dispatch(fetchUserFaliure("User Not Found 😭"));
         }
       })
       .catch((error) => {
+        dispatch(fetchUserFaliure(error));
         console.log("LoginError ", error);
+      });
+  };
+
+  const getUser = () => {
+    http
+      .getItemById(`user/${localStorage.getItem("user_id")}`)
+      .then((response) => {
+        dispatch(fetchUserSuccess(response.data.data.user));
+      })
+      .catch((error) => {
+        dispatch(fetchOfficeFaliure(error.msg));
+      });
+  };
+
+  const getOffice = () => {
+    http
+      .getItemById(`shop/${shop_id}`)
+      .then((response) => {
+        dispatch(fetchOfficeSuccess(response.data.data));
+        navigate("/user");
+      })
+      .catch((error) => {
+        dispatch(fetchOfficeFaliure(error.msg));
       });
   };
 
   useEffect(() => {
     const loggedIn = localStorage.getItem("token");
     if (loggedIn) {
-      navigate("/user");
+      getUser();
+      getOffice();
     }
   });
 

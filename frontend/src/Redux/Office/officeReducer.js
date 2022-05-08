@@ -6,8 +6,8 @@ import {
 
 const initialState = {
   loading: false,
-  office: "",
-  office_id: "",
+  id: "",
+  name: "",
   user_id: [],
   error: "",
 };
@@ -23,7 +23,8 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        office: action.payload.name,
+        id: action.payload._id,
+        name: action.payload.name,
         user_id: action.payload.user_id,
       };
     case FETCH_OFFICE_FALIURE:

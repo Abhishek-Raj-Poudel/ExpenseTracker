@@ -1,16 +1,19 @@
 import React from "react";
 import ReactDOMClient from "react-dom/client";
 import App from "./App";
-import { DataLayer } from "./Datalayer";
-import reducer, { initialState } from "./reducer";
+
+//Redux
+import { Provider } from "react-redux";
+import { store, persistor } from "./Redux/store";
+import { PersistGate } from "redux-persist/integration/react";
 
 const container = document.getElementById("root");
 
 const root = ReactDOMClient.createRoot(container);
 root.render(
-  <>
-    {/* <DataLayer initialState={initialState} reducer={reducer}> */}
-    <App></App>
-    {/* </DataLayer> */}
-  </>
+  <Provider store={store}>
+    <PersistGate loadings={null} persistor={persistor}>
+      <App></App>
+    </PersistGate>
+  </Provider>
 );
