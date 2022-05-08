@@ -4,8 +4,11 @@ import Dashboard from "./Dashboard";
 import Orders from "./Orders/Orders";
 import OrdersCreate from "./Orders/OrdersCreate";
 import OrdersEdit from "./Orders/OrdersEdit";
+//User Crud
+import Users from "./UsersCrud/Users";
+import UserCreate from "./UsersCrud/UserCreate";
+import UserEdit from "./UsersCrud/UserEdit";
 
-import Users from "./Users/Users";
 import CashFlow from "./CashFlow";
 
 export {
@@ -15,5 +18,7 @@ export {
   OrdersCreate,
   OrdersEdit,
   Users,
+  UserCreate,
+  UserEdit,
   CashFlow,
 };

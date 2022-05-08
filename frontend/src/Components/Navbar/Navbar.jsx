@@ -1,20 +1,36 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import NavbarStyled from "../../Styles/NavbarStyled";
+import { connect } from "react-redux";
+import {
+  changeToDarkTheme,
+  changeToLightTheme,
+} from "../../Redux/Theme/themeAction";
+import ThemeButton from "../Utilities/ThemeButton";
 
-export default function Navbar() {
+function Navbar({ theme, lightMode, darkMode }) {
   return (
-    <>
-      <ul>
+    <nav>
+      <NavbarStyled>
         <li>
           <Link to="/">Home</Link>
         </li>
         <li>
-          <Link to="/login">Login</Link>
+          <Link to="/login">
+            <button>Login</button>
+          </Link>
         </li>
         <li>
-          <Link to="/register">Register</Link>
+          <Link to="/register">
+            <button>Register</button>
+          </Link>
         </li>
-      </ul>
-    </>
+        <li>
+          <ThemeButton></ThemeButton>
+        </li>
+      </NavbarStyled>
+    </nav>
   );
 }
+
+export default Navbar;

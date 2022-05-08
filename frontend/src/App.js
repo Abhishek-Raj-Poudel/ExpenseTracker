@@ -1,8 +1,23 @@
-import React from "react";
-import AppRouting from "./AppRouting";
+import React, { useState } from "react";
+import { connect } from "react-redux";
 
-function App() {
-  return <AppRouting></AppRouting>;
+import AppRouting from "./AppRouting";
+import GlobalStyle from "./Styles/GlobalStyle";
+import { ThemeProvider } from "styled-components";
+
+function App(props) {
+  return (
+    <ThemeProvider theme={props.theme}>
+      <GlobalStyle />
+      <AppRouting></AppRouting>;
+    </ThemeProvider>
+  );
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    theme: state.theme.theme,
+  };
+};
+
+export default connect(mapStateToProps)(App);
