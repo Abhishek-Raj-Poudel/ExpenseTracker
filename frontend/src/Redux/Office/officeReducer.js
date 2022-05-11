@@ -8,7 +8,9 @@ const initialState = {
   loading: false,
   id: "",
   name: "",
-  user_id: [],
+  order_id: [],
+  staff_id: [],
+  client_id: [],
   error: "",
 };
 
@@ -25,7 +27,9 @@ const reducer = (state = initialState, action) => {
         loading: false,
         id: action.payload._id,
         name: action.payload.name,
-        user_id: action.payload.user_id,
+        staff_id: action.payload.staff_id,
+        client_id: action.payload.client_id,
+        order_id: action.payload.order_id,
       };
     case FETCH_OFFICE_FALIURE:
       return {

@@ -13,6 +13,7 @@ export const themeLight = {
     subtleText: "#777776",
     white: "#FAFCFD",
     inputField: "#EBEEF2",
+    sidebarText: "#777776",
   },
 };
 export const themeDark = {
@@ -30,5 +31,6 @@ export const themeDark = {
     subtleText: "#777776",
     white: "#FAFCFD",
     inputField: "#333330",
+    sidebarText: "#FAFCFD",
   },
 };

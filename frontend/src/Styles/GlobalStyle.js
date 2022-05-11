@@ -54,6 +54,11 @@ table{
 th{
   text-align:left;
 }
+
+ul{
+  padding-inline-start: 0;
+}
+
 button { 
   
   background-color:${({ theme }) => theme.colour.primary};

@@ -9,6 +9,8 @@ import {
   fetchOfficeSuccess,
   fetchOfficeFaliure,
 } from "../../../Redux/Office/officeAction";
+
+//styles
 import Flexbox from "../../../Styles/Flexbox";
 import Form from "../../../Styles/Form";
 
@@ -31,7 +33,8 @@ export default function UserCreate() {
   const dispatch = useDispatch();
   const shop_id = useSelector((state) => state.user.shop_id);
   const shop = useSelector((state) => state.office);
-  const allUsers = useSelector((state) => state.office.user_id);
+  const allStaffs = useSelector((state) => state.office.staff_id);
+  const allClients = useSelector((state) => state.office.client_id);
   let updatedAllUsers = [];
 
   const handleChange = (event) => {
@@ -42,10 +45,8 @@ export default function UserCreate() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("1");
     setUserValueError(validate(userValue));
     if (Object.keys(userValueError).length === 0) {
-      console.log("2");
       uploadForm();
     } else {
       console.log(
@@ -94,9 +95,6 @@ export default function UserCreate() {
   }, []);
 
   const uploadForm = () => {
-    console.log("3");
-    console.log(userValue.shop_id);
-    console.log("shop_id", shop.id);
     if (userValue.shop_id) {
       http
         .postItem("user", userValue, {
@@ -104,11 +102,12 @@ export default function UserCreate() {
           "content-type": "application/json",
         })
         .then((response) => {
-          console.log("4");
           if (response.data.status === 200) {
-            console.log("5");
-
-            updatedAllUsers = [...allUsers, response.data.data._id];
+            if (userValue.role === "Client") {
+              updatedAllUsers = [...allClients, response.data.data._id];
+            } else {
+              updatedAllUsers = [...allStaffs, response.data.data._id];
+            }
             UpdateShop();
           } else {
             // error(response.data.msg);
@@ -122,26 +121,35 @@ export default function UserCreate() {
   };
 
   const UpdateShop = () => {
-    http
-      .updateItem(
-        `shop/${shop_id}`,
-        { ...shop, user_id: updatedAllUsers },
-        true
-      )
-      .then((response) => {
-        console.log({ ...shop, user_id: updatedAllUsers });
-        dispatch(fetchOfficeSuccess({ ...shop, user_id: updatedAllUsers }));
-        console.log("final shop update ", response);
-      })
-      .catch((error) => {
-        dispatch(fetchOfficeFaliure(error.msg));
-      });
-    navigate("/user/users");
-  };
+    if (userValue.role === "Client") {
+      http
+        .updateItem(
+          `shop/${shop_id}`,
+          { ...shop, client_id: updatedAllUsers },
+          true
+        )
+        .then((response) => {
+          dispatch(fetchOfficeSuccess({ ...shop, client_id: updatedAllUsers }));
+        })
+        .catch((error) => {
+          dispatch(fetchOfficeFaliure(error.msg));
+        });
+    } else {
+      http
+        .updateItem(
+          `shop/${shop_id}`,
+          { ...shop, staff_id: updatedAllUsers },
+          true
+        )
+        .then((response) => {
+          dispatch(fetchOfficeSuccess({ ...shop, staff_id: updatedAllUsers }));
+        })
+        .catch((error) => {
+          dispatch(fetchOfficeFaliure(error.msg));
+        });
+    }
 
-  const test = () => {
-    console.log("shop ", shop);
-    console.log("shop updated ", { ...shop, user_id: updatedAllUsers });
+    navigate("/user/users");
   };
 
   return (
@@ -149,16 +157,16 @@ export default function UserCreate() {
       <Flexbox column align="center">
         <h1>Create a User</h1>
         <Form>
-          <Input label="Name" name="name" handleChange={handleChange} />{" "}
-          <span className="text-danger">{userValueError.name}</span>{" "}
+          <Input label="Name" name="name" handleChange={handleChange} />
+          <span className="text-danger">{userValueError.name}</span>
           <Input
             label="Email"
             name="email"
             handleChange={handleChange}
             required={true}
-          ></Input>{" "}
-          <span className="text-danger">{userValueError.email}</span>{" "}
-          <label>Role</label>{" "}
+          ></Input>
+          <span className="text-danger">{userValueError.email}</span>
+          <label>Role</label>
           <select name="role" type="role" onChange={handleChange}>
             <option value="">--Select A Role--</option>
             <option value="Client">Client</option>
@@ -166,38 +174,31 @@ export default function UserCreate() {
             <option value="Designer">Designer</option>
             <option value="Writer">Writer</option>
             <option value="Writer">Staff</option>
-          </select>{" "}
-          <span className="text-danger">{userValueError.role}</span>{" "}
-          <label>Gender</label>{" "}
+          </select>
+          <span className="text-danger">{userValueError.role}</span>
+          <label>Gender</label>
           <select name="gender" type="gender" onChange={handleChange}>
             <option value="">--Select A Gender--</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
             <option value="Other">Other</option>
-          </select>{" "}
-          <span className="text-danger">{userValueError.gender}</span>{" "}
+          </select>
+          <span className="text-danger">{userValueError.gender}</span>
           <Input
             label="Password"
             name="password"
             handleChange={handleChange}
             required={true}
-          ></Input>{" "}
-          <span className="text-danger">{userValueError.password}</span>{" "}
+          ></Input>
+          <span className="text-danger">{userValueError.password}</span>
           <Input
             label="Re-Password"
             name="re_password"
             type="password"
             handleChange={handleChange}
             required={true}
-          ></Input>{" "}
-          <span className="text-danger">{userValueError.re_password}</span>{" "}
-          <button
-            onClick={() => {
-              test();
-            }}
-          >
-            Test
-          </button>
+          ></Input>
+          <span className="text-danger">{userValueError.re_password}</span>
           <button type="submit" onClick={handleSubmit}>
             Submit
           </button>
