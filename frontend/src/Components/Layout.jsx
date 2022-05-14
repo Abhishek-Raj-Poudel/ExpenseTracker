@@ -4,9 +4,9 @@ import Navbar from "./Navbar/Navbar";
 export default function Layout() {
   return (
     <>
-      <Navbar></Navbar>
-      <div className="content">
-        <Outlet></Outlet>
+      <Navbar />
+      <div>
+        <Outlet />
       </div>
     </>
   );

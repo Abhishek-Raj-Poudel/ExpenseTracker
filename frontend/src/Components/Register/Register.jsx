@@ -117,6 +117,7 @@ function Register() {
       .then((response) => {
         if (response.status === 200) {
           setUserValue({ ...userValue, shop_id: response.data.data._id });
+
           console.log("User Value ", userValue);
           console.log("Shop data Uploaded ", response.data.data);
           setCanSubmit(true);
@@ -141,17 +142,11 @@ function Register() {
           if (response.data.status === 200) {
             setOfficeValue({
               ...officeValue,
-              user_id: [response.data.data._id],
+              staff_id: [response.data.data._id],
             });
-
-            console.log("Shop Value ", officeValue);
-            console.log("User Value Uploaded ", response.data);
             setCanSubmit(false);
             setCanOfficeSubmit(true);
-            // localStorage.setItem("register_success", true);
-            // navigate("/login");
           } else {
-            // error(response.data.msg);
             console.log(response.data.msg);
             setCanSubmit(false);
           }
@@ -192,9 +187,9 @@ function Register() {
   }, [canSubmit, canOfficeSubmit]);
   return (
     <Flexbox column align="center">
+      <h2>Register </h2>
       <Flexbox>
         <Card>
-          <h2>Register </h2>
           <h3>User's Detail</h3>
           <Input
             label="Name"
@@ -240,7 +235,8 @@ function Register() {
           <TextDanger className="text-danger">
             {userValueError.gender}
           </TextDanger>
-
+        </Card>
+        <Card>
           <h3>User's Office</h3>
 
           <Input

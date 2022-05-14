@@ -1,39 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import { HttpClient } from "../../utils/httpClients";
 import Navbar from "./Navbar";
+import styled from "styled-components";
 
-import { useSelector, useDispatch } from "react-redux";
-import {
-  fetchOfficeSuccess,
-  fetchOfficeFaliure,
-} from "../../Redux/Office/officeAction";
+const Grid = styled.div`
+  display: grid;
+  height: 100vh;
+  grid-template-areas:
+    "sidebar navbar"
+    " sidebar main  ";
+  grid-template-columns: 250px 1fr;
+  grid-template-rows: 100px 1fr;
+`;
 
 export default function UserLayout() {
-  const shop_id = useSelector((state) => state.user.shop_id);
-  const dispatch = useDispatch();
-
-  const http = new HttpClient();
-
-  // useEffect(() => {
-  //   http
-  //     .getItemById(`shop/${shop_id}`)
-  //     .then((response) => {
-  //       dispatch(fetchOfficeSuccess(response.data.data));
-  //     })
-  //     .catch((error) => {
-  //       dispatch(fetchOfficeFaliure(error.msg));
-  //     });
-  // }, []);
-
   return (
-    <>
+    <Grid>
       <Navbar></Navbar>
       <Sidebar></Sidebar>
-      <div className="content">
+      <div>
         <Outlet></Outlet>
       </div>
-    </>
+    </Grid>
   );
 }

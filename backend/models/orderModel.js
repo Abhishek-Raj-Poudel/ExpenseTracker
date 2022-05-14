@@ -12,19 +12,16 @@ const OrderSchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
-    products_name: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
-    products_id: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "Product",
-        default: null,
-      },
-    ],
+    products_name: {
+      type: String,
+      required: true,
+    },
+
+    assigned_to: {
+      type: String,
+      enum: ["Accountant", "Designer", "Staff", "Writer"],
+      default: "Staff",
+    },
     total_price: {
       type: Number,
       required: true,
@@ -35,7 +32,7 @@ const OrderSchema = new mongoose.Schema(
         default: null,
       },
     ],
-    paid: { type: Boolean, required: true },
+    paid: { type: Boolean, default: false },
   },
   {
     timestamps: true,
