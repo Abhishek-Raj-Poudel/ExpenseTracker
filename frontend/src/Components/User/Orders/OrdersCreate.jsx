@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { Input } from "../../Inputs/inputs";
 import { HttpClient } from "../../../utils/httpClients";
 
@@ -16,21 +18,26 @@ export default function OrdersCreate() {
     client_id: "",
     products_name: "",
     assigned_to: "",
-    total_price: "",
+    total_price: 0,
   };
 
   const [orderValue, setOrderValue] = useState(commonFields);
   const [orderValueErr, setOrderValueErr] = useState(commonFields);
+
+  const dispatch = useDispatch();
   const shop = useSelector((state) => state.office);
 
+  let allOrdersArr = [];
+
   const http = new HttpClient();
+  const navigate = useNavigate();
 
   const [clients, setClients] = useState([]);
   let clientNameArr = [];
 
   useEffect(() => {
     getAllClients();
-  }, []);
+  }, [orderValue.client_id]);
 
   const getAllClients = () => {
     shop.client_id.map((obj) => {
@@ -56,17 +63,40 @@ export default function OrdersCreate() {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setOrderValue({ ...orderValue, [name]: value });
-    console.log(orderValue);
-    if (orderValue.client_id) {
-      let clientName = clients.map((client) => {
-        if (client._id === orderValue.client_id) {
-          return client.name;
-        }
-      });
-      setOrderValue({ ...orderValue, client_name: clientName });
-    }
   };
-  const handleSubmit = () => {};
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    uploadForm();
+  };
+
+  const uploadForm = () => {
+    http
+      .postItem("order", orderValue, {
+        authorization: `${localStorage.getItem("token")}`,
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          allOrdersArr = [...shop.order_id, response.data.data._id];
+          updateOrderListInShop(allOrdersArr);
+        }
+      })
+      .catch((error) => {
+        console.log("Error: ", error.msg);
+      });
+  };
+
+  const updateOrderListInShop = (value) => {
+    const uploadValue = { ...shop, order_id: value };
+    http
+      .updateItem(`shop/${shop.id}`, uploadValue)
+      .then((response) => {
+        dispatch(fetchOfficeSuccess(uploadValue));
+        navigate("/user/orders");
+      })
+      .catch((error) => {
+        dispatch(fetchOfficeFaliure(error.msg));
+      });
+  };
 
   return (
     <>
@@ -94,29 +124,37 @@ export default function OrdersCreate() {
 
           <Input
             label="Produce Name"
-            name="product_name"
-            onChange={handleChange}
+            name="products_name"
+            handleChange={handleChange}
           />
           <span>{orderValueErr.product_id}</span>
 
           <label>Assigned To</label>
-          <select name="client_id" onChange={handleChange}>
+          <select name="assigned_to" onChange={handleChange}>
             <option value="">---Assigned to--- </option>
-            <option value="Client">Client</option>
             <option value="Accountant">Accountant</option>
             <option value="Designer">Designer</option>
             <option value="Writer">Writer</option>
             <option value="Writer">Staff</option>
           </select>
-          <span>{orderValueErr.client_id}</span>
+          <span>{orderValueErr.assigned_to}</span>
 
           <Input
             label="Total Price"
             name="total_price"
-            onChange={handleChange}
+            type="number"
+            handleChange={handleChange}
           />
           <span>{orderValueErr.product_id}</span>
-          <button type="submit" onClick={handleSubmit}>
+          <button
+            type="submit"
+            onChange={() => {
+              console.log("all clients ", orderValue);
+            }}
+          >
+            test
+          </button>
+          <button type="submit" onChange={handleSubmit}>
             Submit
           </button>
         </Form>

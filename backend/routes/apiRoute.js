@@ -16,7 +16,7 @@ router.use("/auth", authRoute);
 router.use("/admin", [isLoggedIn, isAdmin], adminRoute);
 
 router.use("/category", [isLoggedIn], categoryRoute);
-router.use("/order", [isLoggedIn], orderRoute);
+router.use("/order", orderRoute);
 router.use("/product", [isLoggedIn], productRoute);
 router.use("/shop", shopRoute);
 router.use("/user", userRoute);

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { HttpClient } from "../../../utils/httpClients";
 import { FaPen, FaPlus, FaTrash } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 
@@ -9,7 +8,10 @@ import { fetchOfficeSuccess } from "../../../Redux/Office/officeAction";
 import Flexbox from "../../../Styles/Flexbox";
 import { ButtonDanger } from "../../../Styles/Button";
 
-export default function Users() {
+//utilities
+import { HttpClient } from "../../../utils/httpClients";
+
+export default function Orders() {
   // Redux
   const shop = useSelector((state) => state.office);
   const shop_id = useSelector((state) => state.user.shop_id);
@@ -17,7 +19,7 @@ export default function Users() {
 
   let [allOrders, setAllOrders] = useState([]);
   const http = new HttpClient();
-  let allUserArr = [];
+  let allOrderArr = [];
   useEffect(() => {
     getAllOrders();
   }, [shop]);
@@ -25,15 +27,17 @@ export default function Users() {
   const getAllOrders = () => {
     shop.order_id.map((obj) => {
       http
-        .getItemById(`user/${obj}`)
+        .getItemById(`order/${obj}`)
         .then((response) => {
           let responseValue = response.data.data;
-
+          console.log("response ", responseValue);
           if (responseValue) {
-            allUserArr.push(responseValue);
-            setAllOrders([...allUserArr]);
+            allOrderArr.push(responseValue);
+            setAllOrders([...allOrderArr]);
+            console.log(allOrderArr);
           } else {
             console.log("User not found ");
+            console.log(shop.order_id);
           }
         })
         .catch((error) => {
@@ -44,13 +48,12 @@ export default function Users() {
   };
 
   const deleteItem = (id) => {
-    let updatedUsersArr = shop.user_id.filter((user) => user !== id);
+    let updatedUsersArr = shop.order_id.filter((order) => order !== id);
     http
-      .deleteItem(`user/${id}`, true)
+      .deleteItem(`order/${id}`, true)
       .then((response) => {
         if (response.data.status === 200) {
           //success alert
-          console.log(response.data.msg);
           updateShop(updatedUsersArr);
         } else {
           // error(response.data.msg);
@@ -63,18 +66,21 @@ export default function Users() {
   };
 
   const updateShop = (array) => {
+    let updatedShop = {
+      ...shop,
+      order_id: array,
+    };
     http
-      .updateItem(`shop/${shop_id}`, {
-        ...shop,
-        user_id: array,
-      })
+      .updateItem(`shop/${shop_id}`, updatedShop)
       .then((response) => {
         if (response.data.status === 200) {
           console.log("here");
-          dispatch(fetchOfficeSuccess({ ...shop, user_id: array }));
+          dispatch(fetchOfficeSuccess(updatedShop));
         }
       })
-      .catch();
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -95,6 +101,7 @@ export default function Users() {
             <th>S.N</th>
             <th>Client Name</th>
             <th>Products Bought</th>
+            <th>Assigned to</th>
             <th>Total Price</th>
             <th>Paid</th>
             <th>Action</th>
@@ -104,11 +111,11 @@ export default function Users() {
           {allOrders.map((obj, index) => (
             <tr key={index}>
               <td>{index + 1}</td>
-              <td>{obj.name}</td>
-              <td>{obj.email}</td>
-              <td>{obj.gender}</td>
-              <td>{obj.role}</td>
-              <td>{obj._id}</td>
+              <td>{obj.client_name}</td>
+              <td>{obj.products_name}</td>
+              <td>{obj.assigned_to}</td>
+              <td>{obj.total_price}</td>
+              <td>{obj.paid ? "yes" : "no"}</td>
               <td>
                 <Flexbox
                   justify="flex-start"
@@ -137,13 +144,4 @@ export default function Users() {
       </table>
     </>
   );
-}
-
-{
-  /* <th>S.N</th>
-            <th>Client Name</th>
-            <th>Products Bought</th>
-            <th>Total Price</th>
-            <th>Paid</th>
-            <th>Action</th> */
 }

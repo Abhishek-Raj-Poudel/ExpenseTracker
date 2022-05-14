@@ -144,7 +144,7 @@ export default function UserEdit() {
             {userValueError.gender}
           </TextDanger>
 
-          <button type="submit" onClick={handleSubmit}>
+          <button type="submit" onChange={handleSubmit}>
             Submit
           </button>
         </Form>

@@ -9,14 +9,21 @@ const ShopSchema = new mongoose.Schema(
     address: {
       type: String,
     },
-    product_id: [
+    order_id: [
       {
         type: mongoose.Types.ObjectId,
-        ref: "Product",
+        ref: "Order",
         default: null,
       },
     ],
-    user_id: [
+    staff_id: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+        default: null,
+      },
+    ],
+    client_id: [
       {
         type: mongoose.Types.ObjectId,
         ref: "User",
