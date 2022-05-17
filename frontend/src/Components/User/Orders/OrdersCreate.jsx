@@ -66,10 +66,13 @@ export default function OrdersCreate() {
   };
   const handleSubmit = (event) => {
     event.preventDefault();
+    console.log("here");
     uploadForm();
   };
 
   const uploadForm = () => {
+    console.log("here2");
+
     http
       .postItem("order", orderValue, {
         authorization: `${localStorage.getItem("token")}`,
@@ -154,7 +157,7 @@ export default function OrdersCreate() {
           >
             test
           </button>
-          <button type="submit" onChange={handleSubmit}>
+          <button type="submit" onClick={handleSubmit}>
             Submit
           </button>
         </Form>
