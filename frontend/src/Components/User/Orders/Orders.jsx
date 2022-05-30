@@ -13,31 +13,38 @@ import { HttpClient } from "../../../utils/httpClients";
 
 export default function Orders() {
   // Redux
-  const shop = useSelector((state) => state.office);
-  const shop_id = useSelector((state) => state.user.shop_id);
-  const dispatch = useDispatch();
+  const SHOP = useSelector((state) => state.office);
+  const USER = useSelector((state) => state.user);
+
+  const SHOP_ID = USER.shop_id;
 
   let [allOrders, setAllOrders] = useState([]);
-  const http = new HttpClient();
   let allOrderArr = [];
+
+  const http = new HttpClient();
+  const dispatch = useDispatch();
+
   useEffect(() => {
     getAllOrders();
-  }, [shop]);
+  }, [SHOP]);
 
   const getAllOrders = () => {
-    shop.order_id.map((obj) => {
+    SHOP.order_id.map((obj) => {
       http
         .getItemById(`order/${obj}`)
         .then((response) => {
           let responseValue = response.data.data;
-          console.log("response ", responseValue);
           if (responseValue) {
-            allOrderArr.push(responseValue);
+            if (USER.role !== "Designer") {
+              allOrderArr.push(responseValue);
+            } else {
+              if (responseValue.assigned_to === "Designer") {
+                allOrderArr.push(responseValue);
+              }
+            }
             setAllOrders([...allOrderArr]);
-            console.log(allOrderArr);
           } else {
             console.log("User not found ");
-            console.log(shop.order_id);
           }
         })
         .catch((error) => {
@@ -48,7 +55,7 @@ export default function Orders() {
   };
 
   const deleteItem = (id) => {
-    let updatedUsersArr = shop.order_id.filter((order) => order !== id);
+    let updatedUsersArr = SHOP.order_id.filter((order) => order !== id);
     http
       .deleteItem(`order/${id}`, true)
       .then((response) => {
@@ -67,11 +74,11 @@ export default function Orders() {
 
   const updateShop = (array) => {
     let updatedShop = {
-      ...shop,
+      ...SHOP,
       order_id: array,
     };
     http
-      .updateItem(`shop/${shop_id}`, updatedShop)
+      .updateItem(`shop/${SHOP_ID}`, updatedShop)
       .then((response) => {
         if (response.data.status === 200) {
           console.log("here");

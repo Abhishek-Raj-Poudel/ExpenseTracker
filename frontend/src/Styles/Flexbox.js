@@ -6,6 +6,6 @@ const Flexbox = styled.div`
   justify-content: ${(props) => (props.justify ? props.justify : "center")};
   align-items: ${(props) => (props.align ? props.align : "stretch")};
   gap: ${(props) => (props.gap ? props.gap : "8px")};
-  padding: ${(props) => (props.padding ? props.padding : "1")};
+  padding: ${(props) => (props.padding ? props.padding : "1rem")};
 `;
 export default Flexbox;

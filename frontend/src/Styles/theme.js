@@ -8,7 +8,7 @@ export const themeLight = {
     warning: "#FFC839",
     danger: "#FF6961",
     dark: "#1D1C1A",
-    cards: "#FAFCFD",
+    cards: "#ffffff",
     bodyText: "#31302E",
     subtleText: "#777776",
     white: "#FAFCFD",

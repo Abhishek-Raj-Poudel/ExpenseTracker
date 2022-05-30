@@ -5,15 +5,18 @@ import {
   changeToLightTheme,
 } from "../../Redux/Theme/themeAction";
 
+import Toggle from "../Inputs/Toggle";
+
 function ThemeButton({ theme, darkMode, lightMode }) {
   return (
-    <button
-      onClick={() => {
-        theme.lightTheme ? darkMode() : lightMode();
-      }}
-    >
-      Theme Button
-    </button>
+    <>
+      <Toggle
+        onValue={theme.darkTheme}
+        handleClick={() => {
+          theme.darkTheme ? lightMode() : darkMode();
+        }}
+      />
+    </>
   );
 }
 
