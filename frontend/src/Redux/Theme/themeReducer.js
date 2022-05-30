@@ -3,7 +3,7 @@ import { themeLight } from "../../Styles/theme";
 
 const initialState = {
   theme: themeLight,
-  lightTheme: true,
+  darkTheme: true,
 };
 
 const reducer = (state = initialState, action) => {
@@ -12,13 +12,13 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         theme: action.payload,
-        lightTheme: true,
+        darkTheme: false,
       };
     case DARK_THEME:
       return {
         ...state,
         theme: action.payload,
-        lightTheme: false,
+        darkTheme: true,
       };
     default:
       return state;

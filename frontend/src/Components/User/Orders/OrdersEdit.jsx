@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Input } from "../../Inputs/inputs";
+import Toggle from "../../Inputs/Toggle";
 import { HttpClient } from "../../../utils/httpClients";
 //Redux
 import { useSelector } from "react-redux";
@@ -72,9 +73,8 @@ export default function OrdersEdit() {
     orderUserValueError(validate(orderValue));
   };
 
-  const handleCheck = (event) => {
-    const { name } = event.target;
-    setOrderValue({ ...orderValue, [name]: !orderValue[name] });
+  const handleCheck = () => {
+    setOrderValue({ ...orderValue, paid: !orderValue.paid });
   };
 
   const handleSubmit = (event) => {
@@ -184,12 +184,18 @@ export default function OrdersEdit() {
             handleChange={handleChange}
           />
           <TextDanger>{orderValueError.product_id}</TextDanger>
-          <label>Paid</label>
-          <input name="paid" type="checkbox" onChange={handleCheck} />
+          <Flexbox justify="space-between">
+            <label>Paid</label>
+            <Toggle
+              name="paid"
+              onValue={orderValue.paid}
+              handleClick={handleCheck}
+            />
+          </Flexbox>
           <button
             type="submit"
             onClick={() => {
-              console.log("all clients ", orderValue);
+              console.table("all clients ", orderValue);
             }}
           >
             test

@@ -1,14 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import NavbarStyled from "../../Styles/NavbarStyled";
-import { connect } from "react-redux";
-import {
-  changeToDarkTheme,
-  changeToLightTheme,
-} from "../../Redux/Theme/themeAction";
+
 import ThemeButton from "../Utilities/ThemeButton";
 
-function Navbar({ theme, lightMode, darkMode }) {
+function Navbar() {
   return (
     <nav>
       <NavbarStyled>

@@ -9,6 +9,7 @@ import {
 import Login, { Logout } from "./Components/Login/Login";
 import Register from "./Components/Register/Register";
 import Layout from "./Components/Layout";
+import { useSelector } from "react-redux";
 
 import * as User from "./Components/User/index";
 
@@ -17,6 +18,12 @@ function PrivateRoute({ children }) {
   const isLoggedIn = localStorage.getItem(token);
   return isLoggedIn ? children : <Navigate to="/login" />;
 }
+
+function UserType({ children }) {
+  const USER = useSelector((state) => state.user);
+  return USER.role === "Head" ? children : <Navigate to="/user/orders" />;
+}
+
 export default function AppRouting() {
   return (
     <Router>
@@ -48,7 +55,9 @@ export default function AppRouting() {
             path="users"
             element={
               <PrivateRoute>
-                <User.Users></User.Users>
+                <UserType>
+                  <User.Users></User.Users>
+                </UserType>
               </PrivateRoute>
             }
           />
@@ -56,7 +65,9 @@ export default function AppRouting() {
             path="users/create"
             element={
               <PrivateRoute>
-                <User.UserCreate></User.UserCreate>
+                <UserType>
+                  <User.UserCreate></User.UserCreate>
+                </UserType>
               </PrivateRoute>
             }
           />
@@ -64,7 +75,9 @@ export default function AppRouting() {
             path="users/edit=:id"
             element={
               <PrivateRoute>
-                <User.UserEdit></User.UserEdit>
+                <UserType>
+                  <User.UserEdit></User.UserEdit>
+                </UserType>
               </PrivateRoute>
             }
           />
@@ -98,7 +111,9 @@ export default function AppRouting() {
             path="cashflow"
             element={
               <PrivateRoute>
-                <User.CashFlow></User.CashFlow>
+                <UserType>
+                  <User.CashFlow></User.CashFlow>
+                </UserType>
               </PrivateRoute>
             }
           />

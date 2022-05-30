@@ -64,7 +64,7 @@ button {
   background-color:${({ theme }) => theme.colour.primary};
   color:${({ theme }) => theme.colour.white};
   border: none;
-  padding: 12px 24px;
+  padding: 12px 20px;
   border-radius:8px;
   font-size: 16px;
   text-decoration:none;

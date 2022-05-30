@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 const Card = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: ${(props) => (props.row ? "row" : "column")};
   align-items: ${(props) => (props.align ? props.align : "center")};
   background-color: ${({ theme }) => theme.colour.cards};
   color: ${({ theme }) => theme.colour.bodyText};
