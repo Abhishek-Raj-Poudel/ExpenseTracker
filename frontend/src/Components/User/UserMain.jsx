@@ -11,7 +11,7 @@ const Grid = styled.div`
     "sidebar navbar"
     " sidebar main  ";
   grid-template-columns: 250px 1fr;
-  grid-template-rows: 100px 1fr;
+  grid-template-rows: min-content 1fr;
 `;
 
 export default function UserLayout() {

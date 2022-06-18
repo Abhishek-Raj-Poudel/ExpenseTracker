@@ -1,5 +1,6 @@
 export const themeLight = {
   colour: {
+    toastTheme: "",
     primary: "#4DBBFF",
     secondary: "#FF914D",
     background: "#FAFCFD",

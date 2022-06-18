@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const dbUrl = "mongodb://localhost:27017/office-management-system";
+const dbUrl = "mongodb://0.0.0.0:27017/office-management-system";
 
 mongoose.connect(dbUrl, (err, success) => {
   if (err) {
