@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Toggle from "../Inputs/Toggle";
+import { toast } from "react-toastify";
+import { success } from "../../utils/utils";
 
 export default function Home() {
   const [isOn, setIsOn] = useState(false);
@@ -14,6 +16,7 @@ export default function Home() {
         onValue={isOn}
         handleClick={() => {
           setIsOn(!isOn);
+          success("On");
         }}
       />
     </>
