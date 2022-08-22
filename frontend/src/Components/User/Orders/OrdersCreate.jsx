@@ -18,6 +18,7 @@ export default function OrdersCreate() {
     client_id: "",
     products_name: "",
     assigned_to: "",
+    images: [],
     total_price: 0,
   };
 
@@ -61,8 +62,18 @@ export default function OrdersCreate() {
   };
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
+    const { name, value, type, files } = event.target;
+    if (type == "file") {
+      let filesToUpload = [];
+      Object.keys(files).map((key) => {
+        filesToUpload.push(files[key]);
+      });
+      setOrderValue({ images: filesToUpload });
+
+    }
+
     setOrderValue({ ...orderValue, [name]: value });
+    console.log(orderValue);
   };
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -149,6 +160,8 @@ export default function OrdersCreate() {
             handleChange={handleChange}
           />
           <span>{orderValueErr.product_id}</span>
+          <label>Images: </label>
+          <input type="file" onChange={handleChange} name="image" multiple />
           <button
             type="submit"
             onChange={() => {
