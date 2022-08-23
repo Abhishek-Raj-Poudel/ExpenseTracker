@@ -27,12 +27,7 @@ const OrderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    recept_images: [
-      {
-        type: String,
-        default: null,
-      },
-    ],
+
     paid: { type: Boolean, default: false },
   },
   {

@@ -18,13 +18,13 @@ export default function OrdersCreate() {
     client_id: "",
     products_name: "",
     assigned_to: "",
-    images: [],
+    image: [],
     total_price: 0,
   };
 
   const [orderValue, setOrderValue] = useState(commonFields);
   const [orderValueErr, setOrderValueErr] = useState(commonFields);
-
+  const [filesToUpload, setFilesToUpload] = useState([]);
   const dispatch = useDispatch();
   const shop = useSelector((state) => state.office);
 
@@ -64,38 +64,30 @@ export default function OrdersCreate() {
   const handleChange = (event) => {
     const { name, value, type, files } = event.target;
     if (type == "file") {
-      let filesToUpload = [];
+      let fileToUpload = [];
       Object.keys(files).map((key) => {
-        filesToUpload.push(files[key]);
+        fileToUpload.push(files[key]);
       });
-      setOrderValue({ images: filesToUpload });
-
+      setFilesToUpload(fileToUpload);
+    } else {
+      setOrderValue({ ...orderValue, [name]: value });
     }
-
-    setOrderValue({ ...orderValue, [name]: value });
-    console.log(orderValue);
   };
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("here");
     uploadForm();
   };
 
   const uploadForm = () => {
-    console.log("here2");
-
     http
-      .postItem("order", orderValue, {
-        authorization: `${localStorage.getItem("token")}`,
-      })
+      .uploader(orderValue, filesToUpload, "POST", "order", true)
       .then((response) => {
-        if (response.status === 200) {
-          allOrdersArr = [...shop.order_id, response.data.data._id];
-          updateOrderListInShop(allOrdersArr);
-        }
+        allOrdersArr = [...shop.order_id, response.data._id];
+        updateOrderListInShop(allOrdersArr);
       })
       .catch((error) => {
-        console.log("Error: ", error.msg);
+        console.log("its in catch");
+        console.log("Error: ", error);
       });
   };
 
@@ -160,7 +152,7 @@ export default function OrdersCreate() {
             handleChange={handleChange}
           />
           <span>{orderValueErr.product_id}</span>
-          <label>Images: </label>
+          <label>Recipt </label>
           <input type="file" onChange={handleChange} name="image" multiple />
           <button
             type="submit"
