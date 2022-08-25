@@ -10,11 +10,13 @@ import { useSelector } from "react-redux";
 import Form from "../../../Styles/Form";
 import Flexbox from "../../../Styles/Flexbox";
 import { TextDanger } from "../../../Styles/Texts";
+import { success, error, warning } from "../../../utils/utils";
 const commonFields = {
   client_name: "",
   client_id: "",
   products_name: "",
   assigned_to: "",
+  image: [],
   total_price: 0,
   paid: "",
 };
@@ -57,12 +59,12 @@ export default function OrdersEdit() {
             clientNameArr.push(responseValue);
             setClients([...clientNameArr]);
           } else {
-            console.log("User not found ");
+            error("User not found ");
           }
         })
         .catch((error) => {
           //Maybe add toast Notification.
-          console.log(error);
+          error(error);
         });
     });
   };
@@ -83,12 +85,12 @@ export default function OrdersEdit() {
     if (Object.keys(orderValueError).length === 0) {
       updateForm();
     } else {
-      console.log(
+      error(
         "Not Ready To UPload because ",
         "user error=",
         Object.keys(orderValueError).length
       );
-      console.log(orderValueError);
+      error(orderValueError);
     }
   };
 
@@ -118,11 +120,11 @@ export default function OrdersEdit() {
     http
       .updateItem(`order/${param.id}`, orderValue, true)
       .then((response) => {
-        console.log(response.data.msg);
+        success(response.data.msg);
         navigate("/user/orders");
       })
       .catch((error) => {
-        console.log(error.data.msg);
+        error(error);
       });
   };
 
@@ -175,7 +177,6 @@ export default function OrdersEdit() {
             <option value="Writer">Staff</option>
           </select>
           <TextDanger>{orderValueError.assigned_to}</TextDanger>
-
           <Input
             label="Total Price"
             name="total_price"

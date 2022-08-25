@@ -13,7 +13,7 @@ function App(props) {
         <GlobalStyle />
         <AppRouting />
       </ThemeProvider>
-      <ToastContainer />
+      <ToastContainer theme="dark" />
     </>
   );
 }

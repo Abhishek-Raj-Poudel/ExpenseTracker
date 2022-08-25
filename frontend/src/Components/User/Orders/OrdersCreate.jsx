@@ -12,18 +12,21 @@ import {
 import Form from "../../../Styles/Form";
 import Flexbox from "../../../Styles/Flexbox";
 
+import { success, error, warning } from "../../../utils/utils";
+
 export default function OrdersCreate() {
   const commonFields = {
     client_name: "",
     client_id: "",
     products_name: "",
     assigned_to: "",
+    image: [],
     total_price: 0,
   };
 
   const [orderValue, setOrderValue] = useState(commonFields);
   const [orderValueErr, setOrderValueErr] = useState(commonFields);
-
+  const [filesToUpload, setFilesToUpload] = useState([]);
   const dispatch = useDispatch();
   const shop = useSelector((state) => state.office);
 
@@ -61,30 +64,32 @@ export default function OrdersCreate() {
   };
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
-    setOrderValue({ ...orderValue, [name]: value });
+    const { name, value, type, files } = event.target;
+    if (type == "file") {
+      let fileToUpload = [];
+      Object.keys(files).map((key) => {
+        fileToUpload.push(files[key]);
+      });
+      setFilesToUpload(fileToUpload);
+    } else {
+      setOrderValue({ ...orderValue, [name]: value });
+    }
   };
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("here");
     uploadForm();
   };
 
   const uploadForm = () => {
-    console.log("here2");
-
     http
-      .postItem("order", orderValue, {
-        authorization: `${localStorage.getItem("token")}`,
-      })
+      .uploader(orderValue, filesToUpload, "POST", "order", true)
       .then((response) => {
-        if (response.status === 200) {
-          allOrdersArr = [...shop.order_id, response.data.data._id];
-          updateOrderListInShop(allOrdersArr);
-        }
+        allOrdersArr = [...shop.order_id, response.data._id];
+        success(response.msg);
+        updateOrderListInShop(allOrdersArr);
       })
       .catch((error) => {
-        console.log("Error: ", error.msg);
+        error(error);
       });
   };
 
@@ -149,6 +154,8 @@ export default function OrdersCreate() {
             handleChange={handleChange}
           />
           <span>{orderValueErr.product_id}</span>
+          <label>Recipt </label>
+          <input type="file" onChange={handleChange} name="image" multiple />
           <button
             type="submit"
             onChange={() => {

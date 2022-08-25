@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaPen, FaPlus, FaTrash } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 // redux
 import { useSelector, useDispatch } from "react-redux";
@@ -10,6 +10,7 @@ import { ButtonDanger } from "../../../Styles/Button";
 
 //utilities
 import { HttpClient } from "../../../utils/httpClients";
+import { error, success } from "../../../utils/utils";
 
 export default function Orders() {
   // Redux
@@ -60,15 +61,14 @@ export default function Orders() {
       .deleteItem(`order/${id}`, true)
       .then((response) => {
         if (response.data.status === 200) {
-          //success alert
+          success(response.data.msg);
           updateShop(updatedUsersArr);
         } else {
-          // error(response.data.msg);
-          console.log(response.data.msg);
+          error(response.msg);
         }
       })
       .catch((error) => {
-        console.log(error);
+        error(error);
       });
   };
 
@@ -110,6 +110,7 @@ export default function Orders() {
             <th>Products Bought</th>
             <th>Assigned to</th>
             <th>Total Price</th>
+            <th>Recipt</th>
             <th>Paid</th>
             <th>Action</th>
           </tr>
@@ -122,6 +123,18 @@ export default function Orders() {
               <td>{obj.products_name}</td>
               <td>{obj.assigned_to}</td>
               <td>{obj.total_price}</td>
+              <td>
+                {obj.image != "" ? (
+                  <img
+                    src={process.env.REACT_APP_IMAGE_URL + obj.image}
+                    width={100}
+                    height={100}
+                    onClick={() => {}}
+                  />
+                ) : (
+                  "NA"
+                )}
+              </td>
               <td>{obj.paid ? "yes" : "no"}</td>
               <td>
                 <Flexbox

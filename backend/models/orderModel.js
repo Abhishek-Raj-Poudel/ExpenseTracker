@@ -22,16 +22,12 @@ const OrderSchema = new mongoose.Schema(
       enum: ["Accountant", "Designer", "Staff", "Writer"],
       default: "Staff",
     },
+    image: [String],
     total_price: {
       type: Number,
       required: true,
     },
-    recept_images: [
-      {
-        type: String,
-        default: null,
-      },
-    ],
+
     paid: { type: Boolean, default: false },
   },
   {
