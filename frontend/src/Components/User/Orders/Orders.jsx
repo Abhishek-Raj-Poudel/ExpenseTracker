@@ -10,6 +10,7 @@ import { ButtonDanger } from "../../../Styles/Button";
 
 //utilities
 import { HttpClient } from "../../../utils/httpClients";
+import { error, success } from "../../../utils/utils";
 
 export default function Orders() {
   // Redux
@@ -60,15 +61,14 @@ export default function Orders() {
       .deleteItem(`order/${id}`, true)
       .then((response) => {
         if (response.data.status === 200) {
-          //success alert
+          success(response.data.msg);
           updateShop(updatedUsersArr);
         } else {
-          // error(response.data.msg);
-          console.log(response.data.msg);
+          error(response.msg);
         }
       })
       .catch((error) => {
-        console.log(error);
+        error(error);
       });
   };
 

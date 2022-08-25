@@ -12,6 +12,8 @@ import {
 import Form from "../../../Styles/Form";
 import Flexbox from "../../../Styles/Flexbox";
 
+import { success, error, warning } from "../../../utils/utils";
+
 export default function OrdersCreate() {
   const commonFields = {
     client_name: "",
@@ -83,11 +85,11 @@ export default function OrdersCreate() {
       .uploader(orderValue, filesToUpload, "POST", "order", true)
       .then((response) => {
         allOrdersArr = [...shop.order_id, response.data._id];
+        success(response.msg);
         updateOrderListInShop(allOrdersArr);
       })
       .catch((error) => {
-        console.log("its in catch");
-        console.log("Error: ", error);
+        error(error);
       });
   };
 

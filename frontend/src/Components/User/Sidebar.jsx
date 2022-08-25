@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 // style
 import styled from "styled-components";
 import {
-  FaDesktop,
   FaRegUser,
   FaTasks,
   FaRegMoneyBillAlt,
@@ -53,13 +52,6 @@ export default function Sidebar() {
     <SidebarStyle>
       <h3>User Dashboard</h3>
       <ul>
-        <li>
-          <FaDesktop />
-          <NavLink to="/user">
-            <span>Dashboard</span>
-          </NavLink>
-        </li>
-
         <li>
           <FaRegUser />
           <NavLink to="users">

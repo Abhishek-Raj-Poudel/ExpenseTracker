@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Toggle from "../Inputs/Toggle";
-import { toast } from "react-toastify";
 import { success } from "../../utils/utils";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Home() {
   const [isOn, setIsOn] = useState(false);
@@ -19,6 +20,7 @@ export default function Home() {
           success("On");
         }}
       />
+      
     </>
   );
 }
