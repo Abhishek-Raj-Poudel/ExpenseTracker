@@ -12,7 +12,7 @@ import {
 import Form from "../../../Styles/Form";
 import Flexbox from "../../../Styles/Flexbox";
 
-import { success, error, warning } from "../../../utils/utils";
+import { success, error } from "../../../utils/utils";
 
 export default function OrdersCreate() {
   const commonFields = {
@@ -53,12 +53,11 @@ export default function OrdersCreate() {
             clientNameArr.push(responseValue);
             setClients([...clientNameArr]);
           } else {
-            console.log("User not found ");
+            error("client not found ");
           }
         })
         .catch((error) => {
-          //Maybe add toast Notification.
-          console.log(error);
+          error(error);
         });
     });
   };
@@ -156,14 +155,6 @@ export default function OrdersCreate() {
           <span>{orderValueErr.product_id}</span>
           <label>Recipt </label>
           <input type="file" onChange={handleChange} name="image" multiple />
-          <button
-            type="submit"
-            onChange={() => {
-              console.log("all clients ", orderValue);
-            }}
-          >
-            test
-          </button>
           <button type="submit" onClick={handleSubmit}>
             Submit
           </button>

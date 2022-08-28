@@ -8,6 +8,7 @@ import { HttpClient } from "../../utils/httpClients";
 import Card from "../../Styles/Form";
 import Flexbox from "../../Styles/Flexbox";
 import { TextDanger } from "../../Styles/Texts";
+import { error } from "../../utils/utils";
 
 function Register() {
   const commonUserFields = {
@@ -36,34 +37,24 @@ function Register() {
   const handleUserChange = (event) => {
     const { name, value } = event.target;
     setUserValue({ ...userValue, [name]: value });
-    setUserValueError(validate(userValue));
   };
 
   const handleOfficeChange = (event) => {
     const { name, value } = event.target;
     setOfficeValue({ ...officeValue, [name]: value });
-    setOfficeValueError(officeFormValidate(officeValue));
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     setUserValueError(validate(userValue));
-    console.log(userValueError);
     setOfficeValueError(officeFormValidate(officeValue));
-    console.log(officeValueError);
     if (
       Object.keys(officeValueError).length === 0 &&
       Object.keys(userValueError).length === 0
     ) {
       uploadForm();
     } else {
-      console.log(
-        "Not Ready To UPload because ",
-        "user error=",
-        Object.keys(userValueError).length,
-        "Office error = ",
-        Object.keys(officeValueError).length
-      );
+      error("Some fields are left");
     }
   };
 

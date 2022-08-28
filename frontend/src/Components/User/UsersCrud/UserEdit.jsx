@@ -7,6 +7,7 @@ import { HttpClient } from "../../../utils/httpClients";
 import Form from "../../../Styles/Form";
 import Flexbox from "../../../Styles/Flexbox";
 import { TextDanger } from "../../../Styles/Texts";
+import { error, success } from "../../../utils/utils";
 
 export default function UserEdit() {
   const commonUserFields = {
@@ -28,11 +29,12 @@ export default function UserEdit() {
       .getItemById(`user/${param.id}`, true)
       .then((response) => {
         if (response.data.status === 200) {
-          console.table(response.data.data);
           setUserValue(response.data.data);
         }
       })
-      .catch((error) => {});
+      .catch((error) => {
+        error(error);
+      });
   }, []);
 
   const handleChange = (event) => {
@@ -47,12 +49,12 @@ export default function UserEdit() {
     if (Object.keys(userValueError).length === 0) {
       updateForm();
     } else {
-      console.log(
+      error(
         "Not Ready To UPload because ",
         "user error=",
         Object.keys(userValueError).length
       );
-      console.log(userValueError);
+      error(userValueError);
     }
   };
 
@@ -80,11 +82,11 @@ export default function UserEdit() {
     http
       .updateItem(`user/${param.id}`, userValue, true)
       .then((response) => {
-        console.log(response.data.msg);
+        success(response.data.msg);
         navigate("/user/users");
       })
       .catch((error) => {
-        console.log(error.data.msg);
+        error(error);
       });
   };
 

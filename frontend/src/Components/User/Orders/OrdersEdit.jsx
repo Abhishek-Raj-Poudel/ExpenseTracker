@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 import Form from "../../../Styles/Form";
 import Flexbox from "../../../Styles/Flexbox";
 import { TextDanger } from "../../../Styles/Texts";
-import { success, error, warning } from "../../../utils/utils";
+import { success, error } from "../../../utils/utils";
 const commonFields = {
   client_name: "",
   client_id: "",
@@ -20,6 +20,7 @@ const commonFields = {
   total_price: 0,
   paid: "",
 };
+
 export default function OrdersEdit() {
   const [orderValue, setOrderValue] = useState(commonFields);
   const [orderValueError, orderUserValueError] = useState(commonFields);
@@ -43,7 +44,9 @@ export default function OrdersEdit() {
           setOrderValue(response.data.data);
         }
       })
-      .catch((error) => {});
+      .catch((error) => {
+        error(error);
+      });
 
     getAllClients();
   }, []);
@@ -63,7 +66,6 @@ export default function OrdersEdit() {
           }
         })
         .catch((error) => {
-          //Maybe add toast Notification.
           error(error);
         });
     });
@@ -128,6 +130,8 @@ export default function OrdersEdit() {
       });
   };
 
+  console.log(orderValue);
+
   return (
     <>
       <Flexbox column align="center">
@@ -185,6 +189,23 @@ export default function OrdersEdit() {
             handleChange={handleChange}
           />
           <TextDanger>{orderValueError.product_id}</TextDanger>
+
+          <label>Recipt </label>
+          <input type="file" onChange={handleChange} name="image" multiple />
+          <Flexbox>
+            {orderValue &&
+              orderValue.image &&
+              orderValue.image.map((image, index) => (
+                <img
+                  key={index}
+                  src={process.env.REACT_APP_IMAGE_URL + image}
+                  alt={image}
+                  width="200"
+                  height="100"
+                />
+              ))}
+          </Flexbox>
+
           <Flexbox justify="space-between">
             <label>Paid</label>
             <Toggle

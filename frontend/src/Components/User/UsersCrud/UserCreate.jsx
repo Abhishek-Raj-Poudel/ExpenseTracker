@@ -13,6 +13,8 @@ import {
 //styles
 import Flexbox from "../../../Styles/Flexbox";
 import Form from "../../../Styles/Form";
+import { error, success } from "../../../utils/utils";
+import { TextDanger } from "../../../Styles/Texts";
 
 export default function UserCreate() {
   const commonUserFields = {
@@ -40,7 +42,6 @@ export default function UserCreate() {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setUserValue({ ...userValue, [name]: value });
-    setUserValueError(validate(userValue));
   };
 
   const handleSubmit = (event) => {
@@ -49,8 +50,8 @@ export default function UserCreate() {
     if (Object.keys(userValueError).length === 0) {
       uploadForm();
     } else {
-      console.log(
-        "Not Ready To UPload because ",
+      error(
+        "Not Ready To Upload because ",
         "user error=",
         Object.keys(userValueError).length
       );
@@ -110,12 +111,11 @@ export default function UserCreate() {
             }
             UpdateShop();
           } else {
-            // error(response.data.msg);
-            console.log(response.data.msg);
+            error(response.data.msg);
           }
         })
         .catch((error) => {
-          console.log("Error: ", error);
+          error(error);
         });
     }
   };
@@ -129,9 +129,11 @@ export default function UserCreate() {
           true
         )
         .then((response) => {
+          success(response.data.msg);
           dispatch(fetchOfficeSuccess({ ...shop, client_id: updatedAllUsers }));
         })
         .catch((error) => {
+          error(error);
           dispatch(fetchOfficeFaliure(error.msg));
         });
     } else {
@@ -142,9 +144,11 @@ export default function UserCreate() {
           true
         )
         .then((response) => {
+          success(response.data.msg);
           dispatch(fetchOfficeSuccess({ ...shop, staff_id: updatedAllUsers }));
         })
         .catch((error) => {
+          error(error);
           dispatch(fetchOfficeFaliure(error.msg));
         });
     }
@@ -158,14 +162,14 @@ export default function UserCreate() {
         <h1>Create a User</h1>
         <Form>
           <Input label="Name" name="name" handleChange={handleChange} />
-          <span className="text-danger">{userValueError.name}</span>
+          <TextDanger>{userValueError.name}</TextDanger>
           <Input
             label="Email"
             name="email"
             handleChange={handleChange}
             required={true}
           ></Input>
-          <span className="text-danger">{userValueError.email}</span>
+          <TextDanger>{userValueError.email}</TextDanger>
           <label>Role</label>
           <select name="role" type="role" onChange={handleChange}>
             <option value="">--Select A Role--</option>
@@ -175,7 +179,7 @@ export default function UserCreate() {
             <option value="Writer">Writer</option>
             <option value="Writer">Staff</option>
           </select>
-          <span className="text-danger">{userValueError.role}</span>
+          <TextDanger>{userValueError.role}</TextDanger>
           <label>Gender</label>
           <select name="gender" type="gender" onChange={handleChange}>
             <option value="">--Select A Gender--</option>
@@ -183,14 +187,14 @@ export default function UserCreate() {
             <option value="Female">Female</option>
             <option value="Other">Other</option>
           </select>
-          <span className="text-danger">{userValueError.gender}</span>
+          <TextDanger>{userValueError.gender}</TextDanger>
           <Input
             label="Password"
             name="password"
             handleChange={handleChange}
             required={true}
           ></Input>
-          <span className="text-danger">{userValueError.password}</span>
+          <TextDanger>{userValueError.password}</TextDanger>
           <Input
             label="Re-Password"
             name="re_password"
@@ -198,7 +202,7 @@ export default function UserCreate() {
             handleChange={handleChange}
             required={true}
           ></Input>
-          <span className="text-danger">{userValueError.re_password}</span>
+          <TextDanger>{userValueError.re_password}</TextDanger>
           <button type="submit" onClick={handleSubmit}>
             Submit
           </button>

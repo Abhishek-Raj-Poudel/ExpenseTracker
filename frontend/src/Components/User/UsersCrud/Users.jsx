@@ -11,6 +11,7 @@ import {
 } from "../../../Redux/Office/officeAction";
 import Flexbox from "../../../Styles/Flexbox";
 import { ButtonDanger } from "../../../Styles/Button";
+import { error, success } from "../../../utils/utils";
 
 export default function Users() {
   // Redux
@@ -42,12 +43,11 @@ export default function Users() {
             allStaffArr.push(responseValue);
             setAllStaffs([...allStaffArr]);
           } else {
-            console.log("User not found ");
+            error("Order not found ");
           }
         })
         .catch((error) => {
-          //Maybe add toast Notification.
-          console.log(error);
+          error(error);
         });
     });
   };
@@ -61,14 +61,12 @@ export default function Users() {
           if (responseValue) {
             allClientsArr.push(responseValue);
             setAllClients([...allClientsArr]);
-            console.log("state", allClients);
           } else {
-            console.log("User not found ");
+            error("Order not found ");
           }
         })
         .catch((error) => {
-          //Maybe add toast Notification.
-          console.log(error);
+          error(error);
         });
     });
   };
@@ -79,15 +77,14 @@ export default function Users() {
       .deleteItem(`user/${id}`, true)
       .then((response) => {
         if (response.data.status === 200) {
-          //success alert
+          success(response.data.msg);
           updateStaffInShop(updatedStaffArr);
         } else {
-          // error(response.data.msg);
-          console.log(response.data.msg);
+          error(response.data.msg);
         }
       })
       .catch((error) => {
-        console.log(error);
+        error(error);
       });
   };
   const deleteClient = (id) => {
@@ -96,16 +93,14 @@ export default function Users() {
       .deleteItem(`user/${id}`, true)
       .then((response) => {
         if (response.data.status === 200) {
-          //success alert
-          console.log(response.data.msg);
+          success(response.data.msg);
           updateClientInShop(updatedClientArr);
         } else {
-          // error(response.data.msg);
-          console.log(response.data.msg);
+          error(response.data.msg);
         }
       })
       .catch((error) => {
-        console.log(error);
+        error(error);
       });
   };
 

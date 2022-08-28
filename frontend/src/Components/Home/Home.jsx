@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Toggle from "../Inputs/Toggle";
-import { success } from "../../utils/utils";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Home() {
@@ -12,15 +9,12 @@ export default function Home() {
 
   return (
     <>
-      <h2>Welcome to Home</h2>
-      <Toggle
-        onValue={isOn}
-        handleClick={() => {
-          setIsOn(!isOn);
-          success("On");
-        }}
-      />
-      
+      <h2>Welcome to Office Management System</h2>
+      <p>
+        Here you can create your office, workers/clients, assign workres
+        role,and tesk according to their role then check your cashflow to see if
+        people have paid or not
+      </p>
     </>
   );
 }
