@@ -10,7 +10,10 @@ import { useSelector } from "react-redux";
 import Form from "../../../Styles/Form";
 import Flexbox from "../../../Styles/Flexbox";
 import { TextDanger } from "../../../Styles/Texts";
-import { success, error, warning } from "../../../utils/utils";
+import { success, error } from "../../../utils/utils";
+import { ButtonDanger } from "../../../Styles/Button";
+
+import { FiX } from "react-icons/fi";
 const commonFields = {
   client_name: "",
   client_id: "",
@@ -20,9 +23,11 @@ const commonFields = {
   total_price: 0,
   paid: "",
 };
+
 export default function OrdersEdit() {
   const [orderValue, setOrderValue] = useState(commonFields);
   const [orderValueError, orderUserValueError] = useState(commonFields);
+  const [filesToUpload, setFilesToUpload] = useState([]);
   const [clients, setClients] = useState([]);
   let clientNameArr = [];
 
@@ -43,7 +48,9 @@ export default function OrdersEdit() {
           setOrderValue(response.data.data);
         }
       })
-      .catch((error) => {});
+      .catch((error) => {
+        error(error);
+      });
 
     getAllClients();
   }, []);
@@ -63,15 +70,23 @@ export default function OrdersEdit() {
           }
         })
         .catch((error) => {
-          //Maybe add toast Notification.
           error(error);
         });
     });
   };
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
-    setOrderValue({ ...orderValue, [name]: value });
+    const { name, value, type, files } = event.target;
+    if (type === "file") {
+      let fileToUpload = [];
+      Object.keys(files).map((key) => {
+        fileToUpload.push(files[key]);
+      });
+      setFilesToUpload(fileToUpload);
+      console.log(fileToUpload);
+    } else {
+      setOrderValue({ ...orderValue, [name]: value });
+    }
     orderUserValueError(validate(orderValue));
   };
 
@@ -126,6 +141,24 @@ export default function OrdersEdit() {
       .catch((error) => {
         error(error);
       });
+  };
+
+  const deleteImageFromDB = (index) => {
+    let images = orderValue.image;
+    images.splice(index, 1);
+    setOrderValue((prev) => {
+      return { ...prev, image: images };
+    });
+
+    console.log("images in state " + orderValue.image);
+  };
+
+  const deleteImageFromState = (index) => {
+    let images = filesToUpload;
+    images.splice(index, 1);
+    setFilesToUpload();
+
+    console.log("images in state " + orderValue.image);
   };
 
   return (
@@ -185,6 +218,56 @@ export default function OrdersEdit() {
             handleChange={handleChange}
           />
           <TextDanger>{orderValueError.product_id}</TextDanger>
+
+          <label>Recipt </label>
+          <input type="file" onChange={handleChange} name="image" multiple />
+          <Flexbox>
+            {orderValue &&
+              orderValue.image &&
+              orderValue.image.map((image, index) => (
+                <div key={index}>
+                  <img
+                    src={process.env.REACT_APP_IMAGE_URL + image}
+                    alt={image}
+                    width="200"
+                    height="100"
+                  />
+                  <ButtonDanger
+                    type="button"
+                    value={index}
+                    onClick={() => {
+                      return deleteImageFromDB(index);
+                    }}
+                  >
+                    <FiX></FiX>
+                  </ButtonDanger>
+                </div>
+              ))}
+          </Flexbox>
+          <Flexbox>
+            {filesToUpload &&
+              filesToUpload.length > 0 &&
+              filesToUpload.map((image, index) => (
+                <div key={index}>
+                  <img
+                    src={process.env.REACT_APP_IMAGE_URL + image}
+                    alt={image}
+                    width="200"
+                    height="100"
+                  />
+                  <ButtonDanger
+                    type="button"
+                    value={index}
+                    onClick={() => {
+                      return deleteImageFromDB(index);
+                    }}
+                  >
+                    <FiX></FiX>
+                  </ButtonDanger>
+                </div>
+              ))}
+          </Flexbox>
+
           <Flexbox justify="space-between">
             <label>Paid</label>
             <Toggle
@@ -193,14 +276,6 @@ export default function OrdersEdit() {
               handleClick={handleCheck}
             />
           </Flexbox>
-          <button
-            type="submit"
-            onClick={() => {
-              console.table("all clients ", orderValue);
-            }}
-          >
-            test
-          </button>
           <button type="submit" onClick={handleSubmit}>
             Submit
           </button>

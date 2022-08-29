@@ -73,7 +73,6 @@ export default function CashFlow() {
     }
   };
 
-  // let exportValue = { Name: "", Product: "", Price: "", Paid: "", Time: "" };
   const exportValue = () => {
     let array = [];
     allOrders.map((obj) => {
@@ -95,14 +94,7 @@ export default function CashFlow() {
           <FaFileExport /> Export
         </CSVLink>
       </button>
-      <button
-        onClick={() => {
-          console.log("Order to Export ", orderToExport);
-          console.log("Order ", allOrders);
-        }}
-      >
-        test
-      </button>
+
       <Flexbox column align="center">
         <h2>Earnings Record</h2>
         <CashGrid>

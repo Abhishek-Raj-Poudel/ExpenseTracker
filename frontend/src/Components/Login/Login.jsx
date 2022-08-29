@@ -48,8 +48,6 @@ export default function Login() {
     if (name === "password") {
       if (!(value && value.length >= 8)) {
         setPasswordErr("Password length does not match.");
-      } else {
-        setPasswordErr("");
       }
 
       setPassword(value);

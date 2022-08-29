@@ -36,23 +36,31 @@ export default function Orders() {
         .then((response) => {
           let responseValue = response.data.data;
           if (responseValue) {
-            if (USER.role !== "Designer") {
-              allOrderArr.push(responseValue);
-            } else {
-              if (responseValue.assigned_to === "Designer") {
-                allOrderArr.push(responseValue);
-              }
-            }
+            orderSorting(responseValue);
             setAllOrders([...allOrderArr]);
           } else {
-            console.log("User not found ");
+            error("Order not found ");
           }
         })
         .catch((error) => {
-          //Maybe add toast Notification.
-          console.log(error);
+          error(error);
         });
     });
+  };
+
+  const orderSorting = (responseValue) => {
+    if (USER.role === "Head") {
+      allOrderArr.push(responseValue);
+    } else {
+      if (responseValue.assigned_to === USER.role) {
+        allOrderArr.push(responseValue);
+      }
+      if (USER.role === "Client") {
+        if (responseValue.client_id === USER.id) {
+          allOrderArr.push(responseValue);
+        }
+      }
+    }
   };
 
   const deleteItem = (id) => {
@@ -64,7 +72,7 @@ export default function Orders() {
           success(response.data.msg);
           updateShop(updatedUsersArr);
         } else {
-          error(response.msg);
+          error(response.data.msg);
         }
       })
       .catch((error) => {
@@ -81,12 +89,11 @@ export default function Orders() {
       .updateItem(`shop/${SHOP_ID}`, updatedShop)
       .then((response) => {
         if (response.data.status === 200) {
-          console.log("here");
           dispatch(fetchOfficeSuccess(updatedShop));
         }
       })
       .catch((error) => {
-        console.log(error);
+        error(error);
       });
   };
 
@@ -94,14 +101,14 @@ export default function Orders() {
     <>
       <Flexbox justify="flex-start" align="center" padding="1rem">
         <h2>Welcome to Your Order List</h2>
-
-        <NavLink to="create">
-          <button>
-            <FaPlus /> Add Order
-          </button>
-        </NavLink>
+        {USER.role !== "Client" ? (
+          <NavLink to="create">
+            <button>
+              <FaPlus /> Add Order
+            </button>
+          </NavLink>
+        ) : null}
       </Flexbox>
-
       <table>
         <thead>
           <tr>
@@ -126,9 +133,9 @@ export default function Orders() {
               <td>
                 {obj.image != "" ? (
                   <img
-                    src={process.env.REACT_APP_IMAGE_URL + obj.image}
-                    width={100}
-                    height={100}
+                    src={process.env.REACT_APP_IMAGE_URL + obj.image[0]}
+                    width="200"
+                    height="100"
                     onClick={() => {}}
                   />
                 ) : (
