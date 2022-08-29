@@ -17,6 +17,7 @@ body{
 }
 h1,h2,h3, a{
 font-weight:700;
+color:${({ theme }) => theme.colour.headingText};
 }
 
 h1{
@@ -60,13 +61,13 @@ ul{
 }
 
 button { 
-  
+  display:flex;
   background-color:${({ theme }) => theme.colour.primary};
-  color:${({ theme }) => theme.colour.white};
+  color:${({ theme }) => theme.colour.buttonText};
   border: none;
-  padding: 12px 20px;
+  padding: 12px 40px;
+  gap:8px;
   border-radius:8px;
-  font-size: 16px;
   text-decoration:none;
   text-transform:uppercase;
   font-weight:700;

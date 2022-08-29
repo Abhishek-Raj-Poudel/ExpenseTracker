@@ -133,7 +133,7 @@ export default function Orders() {
               <td>
                 {obj.image != "" ? (
                   <img
-                    src={process.env.REACT_APP_IMAGE_URL + obj.image}
+                    src={process.env.REACT_APP_IMAGE_URL + obj.image[0]}
                     width="200"
                     height="100"
                     onClick={() => {}}

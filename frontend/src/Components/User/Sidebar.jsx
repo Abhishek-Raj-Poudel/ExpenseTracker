@@ -12,7 +12,7 @@ import {
 const SidebarStyle = styled.div`
   grid-area: sidebar;
   padding: 32px 64px 32px 32px;
-  background-color: ${({ theme }) => theme.colour.cards};
+  background-color: ${({ theme }) => theme.colour.background};
   border-radius: 0 8px 8px 0;
   gap: 1rem;
 
