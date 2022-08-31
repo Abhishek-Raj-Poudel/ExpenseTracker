@@ -13,6 +13,8 @@ import Form from "../../../Styles/Form";
 import Flexbox from "../../../Styles/Flexbox";
 
 import { success, error } from "../../../utils/utils";
+import { ButtonDanger } from "../../../Styles/Button";
+import { FiX } from "react-icons/fi";
 
 export default function OrdersCreate() {
   const commonFields = {
@@ -57,6 +59,7 @@ export default function OrdersCreate() {
           }
         })
         .catch((error) => {
+          console.log(error);
           error(error);
         });
     });
@@ -103,6 +106,16 @@ export default function OrdersCreate() {
       .catch((error) => {
         dispatch(fetchOfficeFaliure(error.msg));
       });
+  };
+
+  const deleteImageFromState = (index) => {
+    let images = [...filesToUpload];
+    images.splice(index, 1);
+    console.log(images);
+    setFilesToUpload((prev) => {
+      return images;
+    });
+    console.log(filesToUpload);
   };
 
   return (
@@ -155,6 +168,30 @@ export default function OrdersCreate() {
           <span>{orderValueErr.product_id}</span>
           <label>Recipt </label>
           <input type="file" onChange={handleChange} name="image" multiple />
+          <Flexbox column>
+            {filesToUpload &&
+              filesToUpload.map((image, index) =>
+                image[index] !== "" ? (
+                  <div key={index}>
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt={image}
+                      width="200"
+                      height="100"
+                    />
+                    <ButtonDanger
+                      type="button"
+                      value={index}
+                      onClick={() => {
+                        return deleteImageFromState(index);
+                      }}
+                    >
+                      <FiX></FiX>
+                    </ButtonDanger>
+                  </div>
+                ) : null
+              )}
+          </Flexbox>
           <button type="submit" onClick={handleSubmit}>
             Submit
           </button>

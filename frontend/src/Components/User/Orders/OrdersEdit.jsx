@@ -83,7 +83,6 @@ export default function OrdersEdit() {
         fileToUpload.push(files[key]);
       });
       setFilesToUpload(fileToUpload);
-      console.log(fileToUpload);
     } else {
       setOrderValue({ ...orderValue, [name]: value });
     }
@@ -133,12 +132,13 @@ export default function OrdersEdit() {
 
   const updateForm = () => {
     http
-      .updateItem(`order/${param.id}`, orderValue, true)
+      .uploader(orderValue, filesToUpload, "PUT", `order/${param.id}`, true)
       .then((response) => {
         success(response.data.msg);
         navigate("/user/orders");
       })
       .catch((error) => {
+        console.log("In upload Form func =" + error);
         error(error);
       });
   };
@@ -149,16 +149,17 @@ export default function OrdersEdit() {
     setOrderValue((prev) => {
       return { ...prev, image: images };
     });
-
-    console.log("images in state " + orderValue.image);
+    console.log(orderValue.image);
   };
 
   const deleteImageFromState = (index) => {
-    let images = filesToUpload;
+    let images = [...filesToUpload];
     images.splice(index, 1);
-    setFilesToUpload();
-
-    console.log("images in state " + orderValue.image);
+    console.log(images);
+    setFilesToUpload((prev) => {
+      return images;
+    });
+    console.log(filesToUpload);
   };
 
   return (
@@ -221,51 +222,54 @@ export default function OrdersEdit() {
 
           <label>Recipt </label>
           <input type="file" onChange={handleChange} name="image" multiple />
-          <Flexbox>
+          <Flexbox column>
             {orderValue &&
               orderValue.image &&
-              orderValue.image.map((image, index) => (
-                <div key={index}>
-                  <img
-                    src={process.env.REACT_APP_IMAGE_URL + image}
-                    alt={image}
-                    width="200"
-                    height="100"
-                  />
-                  <ButtonDanger
-                    type="button"
-                    value={index}
-                    onClick={() => {
-                      return deleteImageFromDB(index);
-                    }}
-                  >
-                    <FiX></FiX>
-                  </ButtonDanger>
-                </div>
-              ))}
+              orderValue.image.map((image, index) =>
+                image[index] !== undefined ? (
+                  <div key={index}>
+                    <img
+                      src={process.env.REACT_APP_IMAGE_URL + image}
+                      alt={image}
+                      width="200"
+                      height="100"
+                    />
+                    <ButtonDanger
+                      type="button"
+                      value={index}
+                      onClick={() => {
+                        return deleteImageFromDB(index);
+                      }}
+                    >
+                      <FiX></FiX>
+                    </ButtonDanger>
+                  </div>
+                ) : null
+              )}
           </Flexbox>
-          <Flexbox>
+          <Flexbox column>
             {filesToUpload &&
-              filesToUpload.length > 0 &&
-              filesToUpload.map((image, index) => (
-                <div key={index}>
-                  <img
-                    src={process.env.REACT_APP_IMAGE_URL + image}
-                    alt={image}
-                    width="200"
-                    height="100"
-                  />
-                  <ButtonDanger
-                    type="button"
-                    value={index}
-                    onClick={() => {
-                      return deleteImageFromDB(index);
-                    }}
-                  >
-                    <FiX></FiX>
-                  </ButtonDanger>
-                </div>
-              ))}
+              filesToUpload.map((image, index) =>
+                image[index] !== "" ? (
+                  <div key={index}>
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt={image}
+                      width="200"
+                      height="100"
+                    />
+                    <ButtonDanger
+                      type="button"
+                      value={index}
+                      onClick={() => {
+                        return deleteImageFromState(index);
+                      }}
+                    >
+                      <FiX></FiX>
+                    </ButtonDanger>
+                  </div>
+                ) : null
+              )}
           </Flexbox>
 
           <Flexbox justify="space-between">

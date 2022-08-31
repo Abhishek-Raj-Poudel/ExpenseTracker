@@ -98,10 +98,40 @@ const uploadImage = (request, data, path) => {
             }
           }
         }
-
         if (images.length > 0) {
           data[path[i]] = images;
         }
+      }
+    }
+  }
+  return data;
+};
+
+const updateImage = (request, data, path) => {
+  const { files } = request;
+  if (files) {
+    let old_images = data.image;
+    let images = [];
+    // console.log("data :" + data);
+    if (old_images) {
+      console.log("here " + old_images);
+      images = old_images.split(",");
+    }
+
+    for (file in files) {
+      for (i = 0; i < path.length; i++) {
+        for (j = 0; j < files[file].length; j++) {
+          if (files[file][j].fieldname == path[i]) {
+            if (files[file].length > 1) {
+              images.push(files[file][j].filename);
+            } else {
+              data[path[i]] = files[file][j].filename;
+              console.log("here");
+            }
+          }
+        }
+
+        data[path[i]] = images;
       }
     }
   }
@@ -116,4 +146,5 @@ module.exports = {
   deleteDataById,
   adminDashboard,
   uploadImage,
+  updateImage,
 };

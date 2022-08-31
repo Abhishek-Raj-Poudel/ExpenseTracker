@@ -7,6 +7,7 @@ const {
   updateDataById,
   deleteDataById,
   uploadImage,
+  updateImage,
 } = require("../controller/baseController");
 
 const uploader = require("../middleware/uploader");
@@ -33,7 +34,7 @@ router
   })
   .put(multiple_uploads, (req, res, next) => {
     let data = req.body;
-    data = uploadImage(req, data, imageUploadList);
+    data = updateImage(req, data, imageUploadList);
     updateDataById(req, res, OrderModel, data, orderOutput);
   })
   .delete((req, res, next) => {
