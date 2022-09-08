@@ -1,4 +1,9 @@
+const { default: mongoose } = require("mongoose");
+
 let successOutput, errorOutput;
+
+const fs = require("fs");
+const imagePath = process.cwd() + "/public/images/";
 
 //Internal Output giving functions
 function successResponse(response, success) {
@@ -50,28 +55,65 @@ function getDataById(request, response, Model, outputName) {
 function updateDataById(request, response, Model, data, outputName) {
   successOutput = `${outputName} updated successfully`;
   errorOutput = ` Error updating ${outputName}`;
-  Model.updateOne({ _id: request.params.id }, { $set: data }, { upsert: true })
-    .then((success) => {
-      successResponse(response, success);
-    })
-    .catch((error) => {
-      errorResponse(response, error);
-    });
+  const { id: id } = request.params;
+  const { old_image } = request.body;
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    if (old_image) {
+      fs.unlink(imagePath + old_image, (error) => {
+        if (error) {
+          response.json({ msg: `No such image ${old_image}` });
+        }
+
+        console.log("File deleted successfully");
+      });
+    }
+    Model.updateOne({ _id: id }, { $set: data }, { upsert: true })
+      .then((success) => {
+        successResponse(response, success);
+      })
+      .catch((error) => {
+        errorResponse(response, error);
+      });
+  } else {
+    return response.status(404).json({ msg: `No order with id:${id}` });
+  }
 }
 
-function deleteDataById(request, response, Model, outputName) {
+async function deleteDataById(request, response, Model, outputName) {
   successOutput = `${outputName} deleted successfully`;
   errorOutput = ` Error deleting ${outputName}`;
-  Model.deleteOne({
-    _id: request.params.id,
-  })
-    .then((success) => {
-      successResponse(response, success);
-    })
-    .catch((error) => {
-      errorResponse(response, error);
+  const { id: id } = request.params;
+
+  try {
+    await Model.deleteOne({
+      _id: id,
     });
+    successResponse(response, true);
+  } catch (error) {
+    errorResponse(response, error);
+  }
 }
+
+const deleteOrder = async (request, response, Model, outputName) => {
+  successOutput = `${outputName} deleted successfully`;
+  errorOutput = ` Error deleting ${outputName}`;
+  const { id: id } = request.params;
+
+  try {
+    const order = await Model.findById(id);
+
+    const image = order.image;
+    if (image) {
+      fs.unlinkSync(imagePath + image);
+    }
+
+    await Model.deleteOne({ _id: id });
+    successResponse(response, true);
+  } catch (error) {
+    console.log(error);
+    errorResponse(response, error);
+  }
+};
 
 //Admin Dashboard
 function adminDashboard(request, response, next) {
@@ -82,27 +124,10 @@ function adminDashboard(request, response, next) {
 //after uploading image this will look at fieldname of uploaded file and assign filename to the uploaded file
 //
 const uploadImage = (request, data, path) => {
-  const { files } = request;
-  if (files) {
-    let images = [];
-    for (file in files) {
-      for (i = 0; i < path.length; i++) {
-        //i=0
-        for (j = 0; j < files[file].length; j++) {
-          //j=0
-          if (files[file][j].fieldname == path[i]) {
-            if (files[file].length > 1) {
-              images.push(files[file][j].filename);
-            } else {
-              data[path[i]] = files[file][j].filename;
-            }
-          }
-        }
-        if (images.length > 0) {
-          data[path[i]] = images;
-        }
-      }
-    }
+  const { file } = request;
+  // console.log(request.file);
+  if (file) {
+    data[path] = file.filename;
   }
   return data;
 };
@@ -112,7 +137,6 @@ const updateImage = (request, data, path) => {
   if (files) {
     let old_images = data.image;
     let images = [];
-    // console.log("data :" + data);
     if (old_images) {
       console.log("here " + old_images);
       images = old_images.split(",");
@@ -147,4 +171,5 @@ module.exports = {
   adminDashboard,
   uploadImage,
   updateImage,
+  deleteOrder,
 };
