@@ -22,7 +22,7 @@ const OrderSchema = new mongoose.Schema(
       enum: ["Accountant", "Designer", "Staff", "Writer"],
       default: "Staff",
     },
-    image: [String],
+    image: String,
     total_price: {
       type: Number,
       required: true,

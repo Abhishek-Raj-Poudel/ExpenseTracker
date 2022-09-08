@@ -19,7 +19,8 @@ const commonFields = {
   client_id: "",
   products_name: "",
   assigned_to: "",
-  image: [],
+  image: "",
+  old_image: "",
   total_price: 0,
   paid: "",
 };
@@ -27,7 +28,7 @@ const commonFields = {
 export default function OrdersEdit() {
   const [orderValue, setOrderValue] = useState(commonFields);
   const [orderValueError, orderUserValueError] = useState(commonFields);
-  const [filesToUpload, setFilesToUpload] = useState([]);
+  const [filesToUpload, setFilesToUpload] = useState();
   const [clients, setClients] = useState([]);
   let clientNameArr = [];
 
@@ -82,8 +83,14 @@ export default function OrdersEdit() {
       Object.keys(files).map((key) => {
         fileToUpload.push(files[key]);
       });
+      console.log(orderValue.old_image);
+      if (!orderValue.old_image) {
+        console.log("old image updated " + orderValue.old_image);
+        setOrderValue((prev) => {
+          return { ...prev, old_image: prev.image, image: "" };
+        });
+      }
       setFilesToUpload(fileToUpload);
-      console.log(fileToUpload);
     } else {
       setOrderValue({ ...orderValue, [name]: value });
     }
@@ -133,32 +140,31 @@ export default function OrdersEdit() {
 
   const updateForm = () => {
     http
-      .updateItem(`order/${param.id}`, orderValue, true)
+      .uploader(orderValue, filesToUpload, "PUT", `order/${param.id}`, true)
       .then((response) => {
         success(response.data.msg);
         navigate("/user/orders");
       })
       .catch((error) => {
+        console.log("In upload Form func =" + error);
         error(error);
       });
   };
 
-  const deleteImageFromDB = (index) => {
-    let images = orderValue.image;
-    images.splice(index, 1);
+  const deleteImageFromDB = () => {
     setOrderValue((prev) => {
-      return { ...prev, image: images };
+      return { ...prev, old_image: prev.image, image: "" };
     });
-
-    console.log("images in state " + orderValue.image);
   };
 
   const deleteImageFromState = (index) => {
-    let images = filesToUpload;
+    let images = [...filesToUpload];
     images.splice(index, 1);
-    setFilesToUpload();
-
-    console.log("images in state " + orderValue.image);
+    console.log(images);
+    setFilesToUpload((prev) => {
+      return images;
+    });
+    console.log(filesToUpload);
   };
 
   return (
@@ -221,51 +227,49 @@ export default function OrdersEdit() {
 
           <label>Recipt </label>
           <input type="file" onChange={handleChange} name="image" multiple />
-          <Flexbox>
-            {orderValue &&
-              orderValue.image &&
-              orderValue.image.map((image, index) => (
-                <div key={index}>
-                  <img
-                    src={process.env.REACT_APP_IMAGE_URL + image}
-                    alt={image}
-                    width="200"
-                    height="100"
-                  />
-                  <ButtonDanger
-                    type="button"
-                    value={index}
-                    onClick={() => {
-                      return deleteImageFromDB(index);
-                    }}
-                  >
-                    <FiX></FiX>
-                  </ButtonDanger>
-                </div>
-              ))}
+          <Flexbox column>
+            {orderValue && orderValue.image && (
+              <div>
+                <img
+                  src={process.env.REACT_APP_IMAGE_URL + orderValue.image}
+                  alt={orderValue.image}
+                  width="200"
+                  height="100"
+                />
+                <ButtonDanger
+                  type="button"
+                  onClick={() => {
+                    return deleteImageFromDB();
+                  }}
+                >
+                  <FiX></FiX>
+                </ButtonDanger>
+              </div>
+            )}
           </Flexbox>
-          <Flexbox>
+          <Flexbox column>
             {filesToUpload &&
-              filesToUpload.length > 0 &&
-              filesToUpload.map((image, index) => (
-                <div key={index}>
-                  <img
-                    src={process.env.REACT_APP_IMAGE_URL + image}
-                    alt={image}
-                    width="200"
-                    height="100"
-                  />
-                  <ButtonDanger
-                    type="button"
-                    value={index}
-                    onClick={() => {
-                      return deleteImageFromDB(index);
-                    }}
-                  >
-                    <FiX></FiX>
-                  </ButtonDanger>
-                </div>
-              ))}
+              filesToUpload.map((image, index) =>
+                image[index] !== "" ? (
+                  <div key={index}>
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt={image}
+                      width="200"
+                      height="100"
+                    />
+                    <ButtonDanger
+                      type="button"
+                      value={index}
+                      onClick={() => {
+                        return deleteImageFromState(index);
+                      }}
+                    >
+                      <FiX></FiX>
+                    </ButtonDanger>
+                  </div>
+                ) : null
+              )}
           </Flexbox>
 
           <Flexbox justify="space-between">

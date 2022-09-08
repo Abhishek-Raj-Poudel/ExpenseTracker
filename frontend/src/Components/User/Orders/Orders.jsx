@@ -119,7 +119,7 @@ export default function Orders() {
             <th>Total Price</th>
             <th>Recipt</th>
             <th>Paid</th>
-            <th>Action</th>
+            {USER.role && USER.role !== "Client" && <th>Action</th>}
           </tr>
         </thead>
         <tbody>
@@ -133,7 +133,7 @@ export default function Orders() {
               <td>
                 {obj.image != "" ? (
                   <img
-                    src={process.env.REACT_APP_IMAGE_URL + obj.image[0]}
+                    src={process.env.REACT_APP_IMAGE_URL + obj.image}
                     width="200"
                     height="100"
                     onClick={() => {}}
@@ -143,28 +143,30 @@ export default function Orders() {
                 )}
               </td>
               <td>{obj.paid ? "yes" : "no"}</td>
-              <td>
-                <Flexbox
-                  justify="flex-start"
-                  align="center"
-                  gap="1rem"
-                  padding="12pxc"
-                >
-                  <NavLink to={`edit=${obj._id}`}>
-                    <Flexbox align="center">
-                      <FaPen></FaPen>
-                      <span>Edit</span>
-                    </Flexbox>
-                  </NavLink>
-                  <ButtonDanger
-                    onClick={(event) => {
-                      return deleteItem(obj._id);
-                    }}
+              {USER.role && USER.role !== "Client" && (
+                <td>
+                  <Flexbox
+                    justify="flex-start"
+                    align="center"
+                    gap="1rem"
+                    padding="12pxc"
                   >
-                    <FaTrash></FaTrash>
-                  </ButtonDanger>
-                </Flexbox>
-              </td>
+                    <NavLink to={`edit=${obj._id}`}>
+                      <Flexbox align="center">
+                        <FaPen></FaPen>
+                        <span>Edit</span>
+                      </Flexbox>
+                    </NavLink>
+                    <ButtonDanger
+                      onClick={(event) => {
+                        return deleteItem(obj._id);
+                      }}
+                    >
+                      <FaTrash></FaTrash>
+                    </ButtonDanger>
+                  </Flexbox>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

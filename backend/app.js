@@ -30,8 +30,8 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.json({
     data: null,
-    status: 200,
-    msg: err.message,
+    status: err.status,
+    message: err,
   });
 });
 

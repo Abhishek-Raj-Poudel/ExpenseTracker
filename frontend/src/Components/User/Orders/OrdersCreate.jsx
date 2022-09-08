@@ -13,6 +13,8 @@ import Form from "../../../Styles/Form";
 import Flexbox from "../../../Styles/Flexbox";
 
 import { success, error } from "../../../utils/utils";
+import { ButtonDanger } from "../../../Styles/Button";
+import { FiX } from "react-icons/fi";
 
 export default function OrdersCreate() {
   const commonFields = {
@@ -20,22 +22,24 @@ export default function OrdersCreate() {
     client_id: "",
     products_name: "",
     assigned_to: "",
-    image: [],
+    image: "",
     total_price: 0,
   };
 
   const [orderValue, setOrderValue] = useState(commonFields);
   const [orderValueErr, setOrderValueErr] = useState(commonFields);
   const [filesToUpload, setFilesToUpload] = useState([]);
+  const [clients, setClients] = useState([]);
+
+  const navigate = useNavigate();
+  const http = new HttpClient();
+
+  //Redux Stuff
   const dispatch = useDispatch();
   const shop = useSelector((state) => state.office);
+  const shop_id = useSelector((state) => state.user.shop_id);
 
   let allOrdersArr = [];
-
-  const http = new HttpClient();
-  const navigate = useNavigate();
-
-  const [clients, setClients] = useState([]);
   let clientNameArr = [];
 
   useEffect(() => {
@@ -57,6 +61,7 @@ export default function OrdersCreate() {
           }
         })
         .catch((error) => {
+          console.log(error);
           error(error);
         });
     });
@@ -95,14 +100,30 @@ export default function OrdersCreate() {
   const updateOrderListInShop = (value) => {
     const uploadValue = { ...shop, order_id: value };
     http
-      .updateItem(`shop/${shop.id}`, uploadValue)
+      .updateItem(`shop/${shop_id}`, uploadValue)
       .then((response) => {
-        dispatch(fetchOfficeSuccess(uploadValue));
-        navigate("/user/orders");
+        if (response.data.status === 200) {
+          success(response.data.msg);
+          dispatch(fetchOfficeSuccess(uploadValue));
+          navigate("/user/orders");
+        } else {
+          error(response.data.msg);
+        }
       })
       .catch((error) => {
+        error(error);
         dispatch(fetchOfficeFaliure(error.msg));
       });
+  };
+
+  const deleteImageFromState = (index) => {
+    let images = [...filesToUpload];
+    images.splice(index, 1);
+    console.log(images);
+    setFilesToUpload((prev) => {
+      return images;
+    });
+    console.log(filesToUpload);
   };
 
   return (
@@ -154,7 +175,31 @@ export default function OrdersCreate() {
           />
           <span>{orderValueErr.product_id}</span>
           <label>Recipt </label>
-          <input type="file" onChange={handleChange} name="image" multiple />
+          <input type="file" onChange={handleChange} name="image" />
+          <Flexbox column>
+            {filesToUpload &&
+              filesToUpload.map((image, index) =>
+                image[index] !== "" ? (
+                  <div key={index}>
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt={image}
+                      width="200"
+                      height="100"
+                    />
+                    <ButtonDanger
+                      type="button"
+                      value={index}
+                      onClick={() => {
+                        return deleteImageFromState(index);
+                      }}
+                    >
+                      <FiX></FiX>
+                    </ButtonDanger>
+                  </div>
+                ) : null
+              )}
+          </Flexbox>
           <button type="submit" onClick={handleSubmit}>
             Submit
           </button>

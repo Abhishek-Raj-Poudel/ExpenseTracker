@@ -7,22 +7,21 @@ const {
   updateDataById,
   deleteDataById,
   uploadImage,
+  deleteOrder,
 } = require("../controller/baseController");
 
 const uploader = require("../middleware/uploader");
 
 const orderOutput = "Order";
-const imageUploadList = ["image"];
-const multiple_uploads = uploader.fields([{ name: imageUploadList[0] }]);
 
 router
   .route("/")
   .get((req, res, next) => {
     getAllData(res, OrderModel, `${orderOutput}s`);
   })
-  .post(multiple_uploads, (req, res, next) => {
+  .post(uploader.single("image"), (req, res, next) => {
     let data = new OrderModel(req.body);
-    data = uploadImage(req, data, imageUploadList);
+    data = uploadImage(req, data, "image");
     addData(res, data, orderOutput);
   });
 
@@ -31,13 +30,14 @@ router
   .get((req, res, next) => {
     getDataById(req, res, OrderModel, orderOutput);
   })
-  .put(multiple_uploads, (req, res, next) => {
+  .put(uploader.single("image"), (req, res, next) => {
     let data = req.body;
-    data = uploadImage(req, data, imageUploadList);
+    console.log(req.body.image);
+    data = uploadImage(req, data, "image");
     updateDataById(req, res, OrderModel, data, orderOutput);
   })
   .delete((req, res, next) => {
-    deleteDataById(req, res, OrderModel, orderOutput);
+    deleteOrder(req, res, OrderModel, orderOutput);
   });
 
 module.exports = router;
