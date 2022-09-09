@@ -43,33 +43,23 @@ export default function OrdersCreate() {
   let clientNameArr = [];
 
   useEffect(() => {
-    getAllClients();
-  }, [orderValue.client_id]);
-
-  const getAllClients = () => {
-    shop.client_id.map((obj) => {
-      http
-        .getItemById(`user/${obj}`)
-        .then((response) => {
-          let responseValue = response.data.data;
-
-          if (responseValue) {
-            clientNameArr.push(responseValue);
-            setClients([...clientNameArr]);
-          } else {
-            error("client not found ");
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          error(error);
-        });
+    shop.client_id.map(async (obj) => {
+      try {
+        const response = await http.getItemById(`user/${obj}`);
+        let responseValue = response.data.data;
+        if (responseValue) {
+          clientNameArr.push(responseValue);
+          setClients([...clientNameArr]);
+        }
+      } catch (error) {
+        error("client not found ");
+      }
     });
-  };
+  }, [orderValue.client_id]);
 
   const handleChange = (event) => {
     const { name, value, type, files } = event.target;
-    if (type == "file") {
+    if (type === "file") {
       let fileToUpload = [];
       Object.keys(files).map((key) => {
         fileToUpload.push(files[key]);
@@ -79,41 +69,31 @@ export default function OrdersCreate() {
       setOrderValue({ ...orderValue, [name]: value });
     }
   };
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    uploadForm();
-  };
+    try {
+      const updateOrder = await http.uploader(
+        orderValue,
+        filesToUpload,
+        "POST",
+        "order",
+        true
+      );
+      allOrdersArr = [...shop.order_id, updateOrder.data._id];
+      success(updateOrder.msg);
 
-  const uploadForm = () => {
-    http
-      .uploader(orderValue, filesToUpload, "POST", "order", true)
-      .then((response) => {
-        allOrdersArr = [...shop.order_id, response.data._id];
-        success(response.msg);
-        updateOrderListInShop(allOrdersArr);
-      })
-      .catch((error) => {
-        error(error);
-      });
-  };
-
-  const updateOrderListInShop = (value) => {
-    const uploadValue = { ...shop, order_id: value };
-    http
-      .updateItem(`shop/${shop_id}`, uploadValue)
-      .then((response) => {
-        if (response.data.status === 200) {
-          success(response.data.msg);
-          dispatch(fetchOfficeSuccess(uploadValue));
-          navigate("/user/orders");
-        } else {
-          error(response.data.msg);
-        }
-      })
-      .catch((error) => {
-        error(error);
-        dispatch(fetchOfficeFaliure(error.msg));
-      });
+      const uploadValue = { ...shop, order_id: allOrdersArr };
+      const updateOrderListInShop = await http.updateItem(
+        `shop/${shop_id}`,
+        uploadValue
+      );
+      success(updateOrderListInShop.data.msg);
+      dispatch(fetchOfficeSuccess(uploadValue));
+      navigate("/user/orders");
+    } catch (error) {
+      error(error.msg);
+      dispatch(fetchOfficeFaliure(error.msg));
+    }
   };
 
   const deleteImageFromState = (index) => {

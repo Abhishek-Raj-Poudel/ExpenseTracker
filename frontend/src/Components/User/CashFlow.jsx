@@ -36,23 +36,20 @@ export default function CashFlow() {
   const http = new HttpClient();
 
   useEffect(() => {
-    SHOP.order_id.map((obj) => {
-      http
-        .getItemById(`order/${obj}`)
-        .then((response) => {
-          let responseValue = response.data.data;
-          if (responseValue) {
-            allOrderArr.push(responseValue);
-            setAllOrders([...allOrderArr]);
-            updateCashValue(responseValue);
-          } else {
-            console.log("User not found ");
-          }
-        })
-        .catch((error) => {
-          //Maybe add toast Notification.
-          console.log(error);
-        });
+    SHOP.order_id.map(async (obj) => {
+      try {
+        const response = await http.getItemById(`order/${obj}`);
+        let responseValue = response.data.data;
+        if (responseValue) {
+          allOrderArr.push(responseValue);
+          setAllOrders([...allOrderArr]);
+          updateCashValue(responseValue);
+        } else {
+          console.log("User not found ");
+        }
+      } catch (error) {
+        console.log(error);
+      }
     });
   }, [SHOP]);
 

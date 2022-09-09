@@ -138,17 +138,21 @@ export default function OrdersEdit() {
     return errors;
   };
 
-  const updateForm = () => {
-    http
-      .uploader(orderValue, filesToUpload, "PUT", `order/${param.id}`, true)
-      .then((response) => {
-        success(response.data.msg);
-        navigate("/user/orders");
-      })
-      .catch((error) => {
-        console.log("In upload Form func =" + error);
-        error(error);
-      });
+  const updateForm = async () => {
+    try {
+      const update = await http.uploader(
+        orderValue,
+        filesToUpload,
+        "PUT",
+        `order/${param.id}`,
+        true
+      );
+
+      success(update.data.msg);
+      navigate("/user/orders");
+    } catch (error) {
+      error(error.msg);
+    }
   };
 
   const deleteImageFromDB = () => {
@@ -161,7 +165,7 @@ export default function OrdersEdit() {
     let images = [...filesToUpload];
     images.splice(index, 1);
     console.log(images);
-    setFilesToUpload((prev) => {
+    setFilesToUpload(() => {
       return images;
     });
     console.log(filesToUpload);
