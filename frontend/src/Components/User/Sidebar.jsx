@@ -2,12 +2,16 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 // style
 import styled from "styled-components";
+
 import {
-  FaRegUser,
-  FaTasks,
-  FaRegMoneyBillAlt,
-  FaSignOutAlt,
-} from "react-icons/fa";
+  FiDollarSign,
+  FiLayers,
+  FiList,
+  FiLogOut,
+  FiUsers,
+} from "react-icons/fi";
+
+import { useSelector } from "react-redux";
 
 const SidebarStyle = styled.div`
   grid-area: sidebar;
@@ -22,6 +26,7 @@ const SidebarStyle = styled.div`
 
   & ul {
     display: flex;
+
     flex-direction: column;
     height: 100%;
     gap: 1rem;
@@ -35,6 +40,8 @@ const SidebarStyle = styled.div`
 
   & li {
     display: flex;
+    background: ${({ theme, isActive }) =>
+      !isActive ? theme.colour.background : theme.colour.inputField};
     gap: 8px;
     padding: 12px;
     list-style-type: none;
@@ -48,33 +55,46 @@ const SidebarStyle = styled.div`
 `;
 
 export default function Sidebar() {
+  const USER = useSelector((state) => state.user);
   return (
     <SidebarStyle>
-      <h3>User Dashboard</h3>
+      <h3>Dashboard</h3>
       <ul>
-        <li>
-          <FaRegUser />
-          <NavLink to="users">
-            <span>Users</span>
-          </NavLink>
-        </li>
+        {USER.role && USER.role === "Head" && (
+          <li>
+            <FiLayers />
+            <NavLink to="roles">
+              <span>Roles</span>
+            </NavLink>
+          </li>
+        )}
+        {USER.role && USER.role === "Head" && (
+          <li>
+            <FiUsers />
+            <NavLink to="users">
+              <span>Users</span>
+            </NavLink>
+          </li>
+        )}
 
         <li>
-          <FaTasks />
+          <FiList />
           <NavLink to="orders">
             <span>Orders</span>
           </NavLink>
         </li>
 
-        <li>
-          <FaRegMoneyBillAlt />
-          <NavLink to="cashflow">
-            <span>Cashflow</span>
-          </NavLink>
-        </li>
+        {USER.role && USER.role === "Head" && (
+          <li>
+            <FiDollarSign />
+            <NavLink to="cashflow">
+              <span>Cashflow</span>
+            </NavLink>
+          </li>
+        )}
 
         <li>
-          <FaSignOutAlt />
+          <FiLogOut />
           <NavLink to="/logout">
             <span>Logout</span>
           </NavLink>

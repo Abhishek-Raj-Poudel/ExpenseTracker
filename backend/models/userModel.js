@@ -33,7 +33,7 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["Client", "Accountant", "Head", "Designer", "Staff", "Writer"],
+      // enum: ["Client", "Accountant", "Head", "Designer", "Staff", "Writer"],
       default: "Staff",
     },
     shop_id: {

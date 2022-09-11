@@ -34,7 +34,7 @@ export default function UserCreate() {
   //Redux stuff
   const dispatch = useDispatch();
   const shop_id = useSelector((state) => state.user.shop_id);
-  const shop = useSelector((state) => state.office);
+  const SHOP = useSelector((state) => state.office);
   const allStaffs = useSelector((state) => state.office.staff_id);
   const allClients = useSelector((state) => state.office.client_id);
   let updatedAllUsers = [];
@@ -125,12 +125,12 @@ export default function UserCreate() {
       http
         .updateItem(
           `shop/${shop_id}`,
-          { ...shop, client_id: updatedAllUsers },
+          { ...SHOP, client_id: updatedAllUsers },
           true
         )
         .then((response) => {
           success(response.data.msg);
-          dispatch(fetchOfficeSuccess({ ...shop, client_id: updatedAllUsers }));
+          dispatch(fetchOfficeSuccess({ ...SHOP, client_id: updatedAllUsers }));
         })
         .catch((error) => {
           error(error);
@@ -140,12 +140,12 @@ export default function UserCreate() {
       http
         .updateItem(
           `shop/${shop_id}`,
-          { ...shop, staff_id: updatedAllUsers },
+          { ...SHOP, staff_id: updatedAllUsers },
           true
         )
         .then((response) => {
           success(response.data.msg);
-          dispatch(fetchOfficeSuccess({ ...shop, staff_id: updatedAllUsers }));
+          dispatch(fetchOfficeSuccess({ ...SHOP, staff_id: updatedAllUsers }));
         })
         .catch((error) => {
           error(error);
@@ -173,11 +173,13 @@ export default function UserCreate() {
           <label>Role</label>
           <select name="role" type="role" onChange={handleChange}>
             <option value="">--Select A Role--</option>
-            <option value="Client">Client</option>
-            <option value="Accountant">Accountant</option>
-            <option value="Designer">Designer</option>
-            <option value="Writer">Writer</option>
-            <option value="Writer">Staff</option>
+            {SHOP &&
+              SHOP.roles &&
+              SHOP.roles.map((role, index) => (
+                <option key={index} value={role}>
+                  {role}
+                </option>
+              ))}
           </select>
           <TextDanger>{userValueError.role}</TextDanger>
           <label>Gender</label>

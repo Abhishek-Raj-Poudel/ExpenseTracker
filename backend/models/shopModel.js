@@ -23,6 +23,7 @@ const ShopSchema = new mongoose.Schema(
         default: null,
       },
     ],
+    roles: [String],
     client_id: [
       {
         type: mongoose.Types.ObjectId,

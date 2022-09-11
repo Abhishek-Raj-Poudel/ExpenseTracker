@@ -36,14 +36,15 @@ export default function OrdersCreate() {
 
   //Redux Stuff
   const dispatch = useDispatch();
-  const shop = useSelector((state) => state.office);
-  const shop_id = useSelector((state) => state.user.shop_id);
+  const SHOP = useSelector((state) => state.office);
+  const SHOP_ID = useSelector((state) => state.user.shop_id);
+  console.log(SHOP.roles);
 
   let allOrdersArr = [];
   let clientNameArr = [];
 
   useEffect(() => {
-    shop.client_id.map(async (obj) => {
+    SHOP.client_id.map(async (obj) => {
       try {
         const response = await http.getItemById(`user/${obj}`);
         let responseValue = response.data.data;
@@ -79,12 +80,12 @@ export default function OrdersCreate() {
         "order",
         true
       );
-      allOrdersArr = [...shop.order_id, updateOrder.data._id];
+      allOrdersArr = [...SHOP.order_id, updateOrder.data._id];
       success(updateOrder.msg);
 
-      const uploadValue = { ...shop, order_id: allOrdersArr };
+      const uploadValue = { ...SHOP, order_id: allOrdersArr };
       const updateOrderListInShop = await http.updateItem(
-        `shop/${shop_id}`,
+        `shop/${SHOP_ID}`,
         uploadValue
       );
       success(updateOrderListInShop.data.msg);
@@ -103,7 +104,6 @@ export default function OrdersCreate() {
     setFilesToUpload((prev) => {
       return images;
     });
-    console.log(filesToUpload);
   };
 
   return (
@@ -140,10 +140,17 @@ export default function OrdersCreate() {
           <label>Assigned To</label>
           <select name="assigned_to" onChange={handleChange}>
             <option value="">---Assigned to--- </option>
-            <option value="Accountant">Accountant</option>
+            {SHOP &&
+              SHOP.roles &&
+              SHOP.roles.map((role, index) => (
+                <option key={index} value={role}>
+                  {role}
+                </option>
+              ))}
+            {/* <option value="Accountant">Accountant</option>
             <option value="Designer">Designer</option>
             <option value="Writer">Writer</option>
-            <option value="Writer">Staff</option>
+            <option value="Writer">Staff</option> */}
           </select>
           <span>{orderValueErr.assigned_to}</span>
 

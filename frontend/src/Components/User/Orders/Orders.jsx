@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaPen, FaPlus, FaTrash } from "react-icons/fa";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 // redux
 import { useSelector, useDispatch } from "react-redux";
@@ -131,12 +131,13 @@ export default function Orders() {
               <td>{obj.assigned_to}</td>
               <td>{obj.total_price}</td>
               <td>
-                {obj.image != "" ? (
+                {obj.image !== "" ? (
                   <img
                     src={process.env.REACT_APP_IMAGE_URL + obj.image}
                     width="200"
                     height="100"
                     onClick={() => {}}
+                    alt={obj.image}
                   />
                 ) : (
                   "NA"
@@ -149,7 +150,7 @@ export default function Orders() {
                     justify="flex-start"
                     align="center"
                     gap="1rem"
-                    padding="12pxc"
+                    padding="12px"
                   >
                     <NavLink to={`edit=${obj._id}`}>
                       <Flexbox align="center">
@@ -158,7 +159,7 @@ export default function Orders() {
                       </Flexbox>
                     </NavLink>
                     <ButtonDanger
-                      onClick={(event) => {
+                      onClick={() => {
                         return deleteItem(obj._id);
                       }}
                     >

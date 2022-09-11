@@ -8,6 +8,7 @@ import Form from "../../../Styles/Form";
 import Flexbox from "../../../Styles/Flexbox";
 import { TextDanger } from "../../../Styles/Texts";
 import { error, success } from "../../../utils/utils";
+import { useSelector } from "react-redux";
 
 export default function UserEdit() {
   const commonUserFields = {
@@ -21,6 +22,8 @@ export default function UserEdit() {
   // React Router
   const navigate = useNavigate();
   const param = useParams();
+
+  const SHOP = useSelector((state) => state.office);
 
   const http = new HttpClient();
 
@@ -122,10 +125,13 @@ export default function UserEdit() {
           >
             <option value="">--Select A Role--</option>
             <option value="Client">Client</option>
-            <option value="Accountant">Accountant</option>
-            <option value="Designer">Designer</option>
-            <option value="Writer">Writer</option>
-            <option value="Writer">Staff</option>
+            {SHOP &&
+              SHOP.roles &&
+              SHOP.roles.map((role, index) => (
+                <option key={index} value={role}>
+                  {role}
+                </option>
+              ))}
           </select>
 
           <TextDanger className="text-danger">{userValueError.role}</TextDanger>

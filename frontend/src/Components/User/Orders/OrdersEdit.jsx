@@ -33,7 +33,7 @@ export default function OrdersEdit() {
   let clientNameArr = [];
 
   //Redux
-  const shop = useSelector((state) => state.office);
+  const SHOP = useSelector((state) => state.office);
 
   // React Router
   const navigate = useNavigate();
@@ -57,7 +57,7 @@ export default function OrdersEdit() {
   }, []);
 
   const getAllClients = () => {
-    shop.client_id.map((obj) => {
+    SHOP.client_id.map((obj) => {
       http
         .getItemById(`user/${obj}`)
         .then((response) => {
@@ -214,10 +214,13 @@ export default function OrdersEdit() {
             value={orderValue.assigned_to}
           >
             <option value="">---Assigned to--- </option>
-            <option value="Accountant">Accountant</option>
-            <option value="Designer">Designer</option>
-            <option value="Writer">Writer</option>
-            <option value="Writer">Staff</option>
+            {SHOP &&
+              SHOP.roles &&
+              SHOP.roles.map((role, index) => (
+                <option key={index} value={role}>
+                  {role}
+                </option>
+              ))}
           </select>
           <TextDanger>{orderValueError.assigned_to}</TextDanger>
           <Input
