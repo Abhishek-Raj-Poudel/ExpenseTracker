@@ -27,7 +27,10 @@ export default function OrdersCreate() {
   };
 
   const [orderValue, setOrderValue] = useState(commonFields);
+  console.log(orderValue);
   const [orderValueErr, setOrderValueErr] = useState(commonFields);
+  const [otherOrder, setOtherOrder] = useState();
+  const [otherOrderID, setOtherOrderID] = useState();
   const [filesToUpload, setFilesToUpload] = useState([]);
   const [clients, setClients] = useState([]);
 
@@ -38,8 +41,6 @@ export default function OrdersCreate() {
   const dispatch = useDispatch();
   const SHOP = useSelector((state) => state.office);
   const SHOP_ID = useSelector((state) => state.user.shop_id);
-  console.log(SHOP.roles);
-
   let allOrdersArr = [];
   let clientNameArr = [];
 
@@ -55,6 +56,7 @@ export default function OrdersCreate() {
       } catch (error) {
         error("client not found ");
       }
+      setOtherOrderID(SHOP.other_orders.length);
     });
   }, [orderValue.client_id]);
 
@@ -101,7 +103,7 @@ export default function OrdersCreate() {
     let images = [...filesToUpload];
     images.splice(index, 1);
     console.log(images);
-    setFilesToUpload((prev) => {
+    setFilesToUpload(() => {
       return images;
     });
   };

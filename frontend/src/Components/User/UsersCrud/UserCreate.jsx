@@ -15,6 +15,7 @@ import Flexbox from "../../../Styles/Flexbox";
 import Form from "../../../Styles/Form";
 import { error, success } from "../../../utils/utils";
 import { TextDanger } from "../../../Styles/Texts";
+import { validate } from "../../../utils/validation";
 
 export default function UserCreate() {
   const commonUserFields = {
@@ -28,6 +29,7 @@ export default function UserCreate() {
   };
   const [userValue, setUserValue] = useState(commonUserFields);
   const [userValueError, setUserValueError] = useState(commonUserFields);
+  const [canSubmit, setCanSubmit] = useState(false);
   const navigate = useNavigate();
   const http = new HttpClient();
 
@@ -39,6 +41,13 @@ export default function UserCreate() {
   const allClients = useSelector((state) => state.office.client_id);
   let updatedAllUsers = [];
 
+  useEffect(() => {
+    setUserValue({
+      ...userValue,
+      shop_id: shop_id,
+    });
+  }, []);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setUserValue({ ...userValue, [name]: value });
@@ -47,53 +56,17 @@ export default function UserCreate() {
   const handleSubmit = (event) => {
     event.preventDefault();
     setUserValueError(validate(userValue));
-    if (Object.keys(userValueError).length === 0) {
-      uploadForm();
-    } else {
-      error(
-        "Not Ready To Upload because ",
-        "user error=",
-        Object.keys(userValueError).length
-      );
-    }
-  };
-
-  const validate = (values) => {
-    const errors = {};
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i; //find out about regex
-    if (!values.name) {
-      errors.name = "Name is required!";
-    }
-    if (!values.email) {
-      errors.email = "Email is required!";
-    } else if (!regex.test(values.email)) {
-      errors.email = "This is not a valid email format!";
-    }
-    if (!values.password) {
-      errors.password = "Password is required";
-    } else if (values.password.length < 4) {
-      errors.password = "Password must be more than 4 characters";
-    }
-    if (!values.re_password) {
-      errors.re_password = "re-password is required";
-    } else if (!values.re_password === values.password) {
-      errors.re_password = "Password didn't match";
-    }
-    if (!values.gender) {
-      errors.gender = "Please select gender";
-    }
-    if (!values.role) {
-      errors.role = "Role is required";
-    }
-    return errors;
+    setCanSubmit(true);
   };
 
   useEffect(() => {
-    setUserValue({
-      ...userValue,
-      shop_id: shop_id,
-    });
-  }, []);
+    if (Object.keys(userValueError).length === 0 && canSubmit) {
+      uploadForm();
+    } else if (canSubmit) {
+      error("Some things are left!");
+      setCanSubmit(false);
+    }
+  }, [userValueError]);
 
   const uploadForm = () => {
     if (userValue.shop_id) {
@@ -160,7 +133,7 @@ export default function UserCreate() {
     <>
       <Flexbox column align="center">
         <h1>Create a User</h1>
-        <Form>
+        <Form action="submit">
           <Input label="Name" name="name" handleChange={handleChange} />
           <TextDanger>{userValueError.name}</TextDanger>
           <Input

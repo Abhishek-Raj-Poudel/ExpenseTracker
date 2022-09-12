@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
 import { Input } from "../Inputs/inputs";
 import { HttpClient } from "../../utils/httpClients";
-import { validate } from "../../utils/validation";
+import { validate, officeValidate } from "../../utils/validation";
 // style
 import Card from "../../Styles/Form";
 import Flexbox from "../../Styles/Flexbox";
 import { TextDanger } from "../../Styles/Texts";
 import { error, success } from "../../utils/utils";
+import Form from "../../Styles/Form";
 
 function Register() {
   const commonUserFields = {
@@ -46,7 +47,7 @@ function Register() {
   const handleSubmit = (event) => {
     event.preventDefault();
     setUserValueError(validate(userValue));
-    setOfficeValueError(validate(officeValue));
+    setOfficeValueError(officeValidate(officeValue));
     setCanSubmit(true);
   };
 
@@ -102,7 +103,7 @@ function Register() {
     <Flexbox column align="center">
       <h2>Register </h2>
       <Flexbox>
-        <Card>
+        <Form>
           <h3>User's Detail</h3>
           <Input
             label="Name"
@@ -148,8 +149,8 @@ function Register() {
           <TextDanger className="text-danger">
             {userValueError.gender}
           </TextDanger>
-        </Card>
-        <Card>
+        </Form>
+        <Form>
           <h3>User's Office</h3>
 
           <Input
@@ -174,7 +175,7 @@ function Register() {
           <button type="submit" onClick={handleSubmit}>
             Submit
           </button>
-        </Card>
+        </Form>
       </Flexbox>
     </Flexbox>
   );

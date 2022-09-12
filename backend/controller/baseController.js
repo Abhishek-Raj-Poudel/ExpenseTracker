@@ -125,7 +125,7 @@ function adminDashboard(request, response, next) {
 //
 const uploadImage = (request, data, path) => {
   const { file } = request;
-  // console.log(request.file);
+
   if (file) {
     data[path] = file.filename;
   }

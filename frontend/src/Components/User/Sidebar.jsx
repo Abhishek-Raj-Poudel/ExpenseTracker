@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 // style
 import styled from "styled-components";
 
@@ -33,19 +33,18 @@ const SidebarStyle = styled.div`
     color: ${({ theme }) => theme.colour.sidebarText};
   }
 
-  & a {
-    text-decoration: none;
-    color: ${({ theme }) => theme.colour.sidebarText};
-  }
-
   & li {
     display: flex;
-    background: ${({ theme, isActive }) =>
-      !isActive ? theme.colour.background : theme.colour.inputField};
     gap: 8px;
     padding: 12px;
     list-style-type: none;
     align-items: center;
+    border-radius: 8px;
+  }
+
+  & a {
+    text-decoration: none;
+    color: ${({ theme }) => theme.colour.sidebarText};
   }
 
   & li:last-child {
@@ -54,43 +53,57 @@ const SidebarStyle = styled.div`
   }
 `;
 
+const List = styled.li`
+  display: flex;
+  background: ${({ theme, isActive }) => isActive && theme.colour.inputField};
+  gap: 8px;
+  padding: 12px;
+  list-style-type: none;
+  align-items: center;
+  border-radius: 8px;
+`;
+
 export default function Sidebar() {
+  const { pathname } = useLocation();
+
   const USER = useSelector((state) => state.user);
   return (
     <SidebarStyle>
-      <h3>Dashboard</h3>
+      <NavLink to="">
+        <h3>Dashboard</h3>
+      </NavLink>
       <ul>
         {USER.role && USER.role === "Head" && (
-          <li>
+          <List isActive={pathname === "/user/roles"}>
             <FiLayers />
             <NavLink to="roles">
               <span>Roles</span>
             </NavLink>
-          </li>
+          </List>
         )}
         {USER.role && USER.role === "Head" && (
-          <li>
+          <List isActive={pathname === "/user/users"}>
             <FiUsers />
             <NavLink to="users">
               <span>Users</span>
             </NavLink>
-          </li>
+          </List>
         )}
 
-        <li>
+        <List isActive={pathname === "/user/orders"}>
           <FiList />
           <NavLink to="orders">
             <span>Orders</span>
           </NavLink>
-        </li>
+        </List>
 
         {USER.role && USER.role === "Head" && (
-          <li>
+          <List isActive={pathname === "/user/cashflow"}>
             <FiDollarSign />
             <NavLink to="cashflow">
               <span>Cashflow</span>
             </NavLink>
-          </li>
+          </List>
         )}
 
         <li>

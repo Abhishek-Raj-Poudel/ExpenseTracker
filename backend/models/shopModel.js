@@ -31,6 +31,7 @@ const ShopSchema = new mongoose.Schema(
         default: null,
       },
     ],
+    other_orders: [Object],
     service: {
       type: String,
       default: "Service",

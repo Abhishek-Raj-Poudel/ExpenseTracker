@@ -8,6 +8,8 @@ const {
   deleteDataById,
 } = require("../controller/baseController");
 
+const uploader = require("../middleware/uploader");
+
 const shopOutput = "Shop";
 
 router
@@ -25,9 +27,9 @@ router
   .get((req, res, next) => {
     getDataById(req, res, ShopModel, shopOutput);
   })
-  .put((req, res, next) => {
+  .put(uploader.single("image"), (req, res, next) => {
     let data = req.body;
-    updateDataById(req, res, ShopModel, data, shopOutput);
+    data = updateDataById(req, res, ShopModel, data, shopOutput);
   })
   .delete((req, res, next) => {
     deleteDataById(req, res, ShopModel, shopOutput);
