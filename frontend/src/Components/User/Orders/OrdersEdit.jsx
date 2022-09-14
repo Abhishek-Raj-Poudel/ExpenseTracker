@@ -14,6 +14,7 @@ import { success, error } from "../../../utils/utils";
 import { ButtonDanger } from "../../../Styles/Button";
 
 import { FiX } from "react-icons/fi";
+import { orderValidate, validate } from "../../../utils/validation";
 const commonFields = {
   client_name: "",
   client_id: "",
@@ -27,9 +28,11 @@ const commonFields = {
 
 export default function OrdersEdit() {
   const [orderValue, setOrderValue] = useState(commonFields);
-  const [orderValueError, orderUserValueError] = useState(commonFields);
+  const [orderValueError, setOrderValueError] = useState(commonFields);
   const [filesToUpload, setFilesToUpload] = useState();
   const [clients, setClients] = useState([]);
+  const [canSubmit, setCanSubmit] = useState(false);
+
   let clientNameArr = [];
 
   //Redux
@@ -94,7 +97,7 @@ export default function OrdersEdit() {
     } else {
       setOrderValue({ ...orderValue, [name]: value });
     }
-    orderUserValueError(validate(orderValue));
+    setOrderValueError(validate(orderValue));
   };
 
   const handleCheck = () => {
@@ -103,40 +106,18 @@ export default function OrdersEdit() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    orderUserValueError(validate(orderValue));
-    if (Object.keys(orderValueError).length === 0) {
+    setOrderValueError(orderValidate(orderValue));
+    setCanSubmit(true);
+  };
+
+  useEffect(() => {
+    if (Object.keys(orderValueError).length === 0 && canSubmit) {
       updateForm();
-    } else {
-      error(
-        "Not Ready To UPload because ",
-        "user error=",
-        Object.keys(orderValueError).length
-      );
-      error(orderValueError);
+    } else if (canSubmit) {
+      error("Some things are left!");
+      setCanSubmit(false);
     }
-  };
-
-  const validate = (values) => {
-    const errors = {};
-    if (!values.client_name) {
-      errors.client_name = "Client Name is required!";
-    }
-    if (!values.client_id) {
-      errors.client_id = "Choose a client";
-    }
-    if (!values.products_name) {
-      errors.products_name = "Please give a name to the product";
-    }
-    if (!values.assigned_to) {
-      errors.assigned_to = "Assign it to someone";
-    }
-
-    if (!values.total_price) {
-      errors.total_price = "Price is missing";
-    }
-
-    return errors;
-  };
+  }, [orderValueError]);
 
   const updateForm = async () => {
     try {

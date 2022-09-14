@@ -5,7 +5,6 @@ const {
   addData,
   getDataById,
   updateDataById,
-  deleteDataById,
   uploadImage,
   deleteOrder,
 } = require("../controller/baseController");

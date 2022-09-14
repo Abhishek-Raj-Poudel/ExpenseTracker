@@ -25,10 +25,9 @@ export default function UserCreate() {
     re_password: "",
     gender: "",
     role: "",
-    shop_id: null,
   };
   const [userValue, setUserValue] = useState(commonUserFields);
-  const [userValueError, setUserValueError] = useState(commonUserFields);
+  const [userValueError, setUserValueError] = useState({});
   const [canSubmit, setCanSubmit] = useState(false);
   const navigate = useNavigate();
   const http = new HttpClient();

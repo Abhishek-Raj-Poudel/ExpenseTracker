@@ -47,7 +47,7 @@ function Register() {
   const handleSubmit = (event) => {
     event.preventDefault();
     setUserValueError(validate(userValue));
-    setOfficeValueError(officeValidate(officeValue));
+    setOfficeValueError(validate(officeValue));
     setCanSubmit(true);
   };
 

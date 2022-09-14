@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { HttpClient } from "../../utils/httpClients";
 //redux
 import { useSelector } from "react-redux";
-import { FaFileExport } from "react-icons/fa";
 import { CSVLink } from "react-csv";
 
 //style Import
@@ -10,6 +9,7 @@ import styled from "styled-components";
 import Flexbox from "../../Styles/Flexbox";
 import Card from "../../Styles/Card";
 import { StyledText } from "../../Styles/Texts";
+import { FiDownload } from "react-icons/fi";
 
 const CashGrid = styled.div`
   display: Grid;
@@ -86,11 +86,11 @@ export default function CashFlow() {
 
   return (
     <>
-      <button>
-        <CSVLink data={orderToExport}>
-          <FaFileExport /> Export
-        </CSVLink>
-      </button>
+      <CSVLink data={orderToExport}>
+        <button>
+          <FiDownload />
+        </button>
+      </CSVLink>
 
       <Flexbox column align="center">
         <h2>Earnings Record</h2>

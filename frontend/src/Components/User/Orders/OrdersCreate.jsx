@@ -15,6 +15,8 @@ import Flexbox from "../../../Styles/Flexbox";
 import { success, error } from "../../../utils/utils";
 import { ButtonDanger } from "../../../Styles/Button";
 import { FiX } from "react-icons/fi";
+import { orderValidate } from "../../../utils/validation";
+import { TextDanger } from "../../../Styles/Texts";
 
 export default function OrdersCreate() {
   const commonFields = {
@@ -27,12 +29,10 @@ export default function OrdersCreate() {
   };
 
   const [orderValue, setOrderValue] = useState(commonFields);
-  console.log(orderValue);
   const [orderValueErr, setOrderValueErr] = useState(commonFields);
-  const [otherOrder, setOtherOrder] = useState();
-  const [otherOrderID, setOtherOrderID] = useState();
   const [filesToUpload, setFilesToUpload] = useState([]);
   const [clients, setClients] = useState([]);
+  const [canSubmit, setCanSubmit] = useState(false);
 
   const navigate = useNavigate();
   const http = new HttpClient();
@@ -56,7 +56,6 @@ export default function OrdersCreate() {
       } catch (error) {
         error("client not found ");
       }
-      setOtherOrderID(SHOP.other_orders.length);
     });
   }, [orderValue.client_id]);
 
@@ -72,8 +71,22 @@ export default function OrdersCreate() {
       setOrderValue({ ...orderValue, [name]: value });
     }
   };
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
+    setOrderValueErr(orderValidate(orderValue));
+    setCanSubmit(true);
+  };
+
+  useEffect(() => {
+    if (Object.keys(orderValueErr).length === 0 && canSubmit) {
+      uploadForm();
+    } else if (canSubmit) {
+      error("Some things are left!");
+      setCanSubmit(false);
+    }
+  }, [orderValueErr]);
+
+  const uploadForm = async () => {
     try {
       const updateOrder = await http.uploader(
         orderValue,
@@ -119,7 +132,7 @@ export default function OrdersCreate() {
             value={orderValue.client_name}
             handleChange={handleChange}
           ></Input>
-          <span>{orderValueErr.client_name}</span>
+          <TextDanger>{orderValueErr.client_name}</TextDanger>
 
           <label>Client</label>
           <select name="client_id" onChange={handleChange}>
@@ -130,14 +143,14 @@ export default function OrdersCreate() {
               </option>
             ))}
           </select>
-          <span>{orderValueErr.client_id}</span>
+          <TextDanger>{orderValueErr.client_id}</TextDanger>
 
           <Input
             label="Produce Name"
             name="products_name"
             handleChange={handleChange}
           />
-          <span>{orderValueErr.product_id}</span>
+          <TextDanger>{orderValueErr.products_name}</TextDanger>
 
           <label>Assigned To</label>
           <select name="assigned_to" onChange={handleChange}>
@@ -149,12 +162,8 @@ export default function OrdersCreate() {
                   {role}
                 </option>
               ))}
-            {/* <option value="Accountant">Accountant</option>
-            <option value="Designer">Designer</option>
-            <option value="Writer">Writer</option>
-            <option value="Writer">Staff</option> */}
           </select>
-          <span>{orderValueErr.assigned_to}</span>
+          <TextDanger>{orderValueErr.assigned_to}</TextDanger>
 
           <Input
             label="Total Price"
@@ -162,7 +171,6 @@ export default function OrdersCreate() {
             type="number"
             handleChange={handleChange}
           />
-          <span>{orderValueErr.product_id}</span>
           <label>Recipt </label>
           <input type="file" onChange={handleChange} name="image" />
           <Flexbox column>
