@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
 import { Input } from "../Inputs/inputs";
 import { HttpClient } from "../../utils/httpClients";
-import { validate, officeValidate } from "../../utils/validation";
+import { validate } from "../../utils/validation";
 // style
-import Card from "../../Styles/Form";
 import Flexbox from "../../Styles/Flexbox";
 import { TextDanger } from "../../Styles/Texts";
 import { error, success } from "../../utils/utils";
@@ -30,6 +29,8 @@ function Register() {
   const [officeValueError, setOfficeValueError] = useState({});
   const [canSubmit, setCanSubmit] = useState(false);
 
+  const tempUploadForm = useRef();
+
   const navigate = useNavigate();
 
   const http = new HttpClient();
@@ -51,52 +52,56 @@ function Register() {
     setCanSubmit(true);
   };
 
-  useEffect(() => {
-    const uploadForm = async () => {
-      try {
-        if (
-          Object.keys(officeValueError).length === 0 &&
-          Object.keys(userValueError).length === 0 &&
-          canSubmit
-        ) {
-          const createShop = await http.postItem("shop", officeValue, {
-            "Access-Control-Allow-Origin": "*",
-            "content-type": "application/json",
-          });
-          if (createShop.status !== 200) throw error(createShop.msg);
-          const userUploadData = {
-            ...userValue,
-            shop_id: createShop.data.data._id,
-          };
-          const createUser = await http.postItem("user", userUploadData, {
-            "Access-Control-Allow-Origin": "*",
-            "content-type": "application/json",
-          });
+  const uploadForm = async () => {
+    try {
+      if (
+        Object.keys(officeValueError).length === 0 &&
+        Object.keys(userValueError).length === 0 &&
+        canSubmit
+      ) {
+        const createShop = await http.postItem("shop", officeValue, {
+          "Access-Control-Allow-Origin": "*",
+          "content-type": "application/json",
+        });
+        if (createShop.status !== 200) throw error(createShop.msg);
+        const userUploadData = {
+          ...userValue,
+          shop_id: createShop.data.data._id,
+        };
+        const createUser = await http.postItem("user", userUploadData, {
+          "Access-Control-Allow-Origin": "*",
+          "content-type": "application/json",
+        });
 
-          if (createUser.data.status !== 200) throw error(createUser.msg);
-          const officeUploadData = {
-            ...officeValue,
-            roles: ["Head", "Client"],
-            staff_id: [createUser.data.data._id],
-          };
+        if (createUser.data.status !== 200) throw error(createUser.msg);
+        const officeUploadData = {
+          ...officeValue,
+          roles: ["Head", "Client"],
+          staff_id: [createUser.data.data._id],
+        };
 
-          const updateShop = await http.updateItem(
-            `shop/${createShop.data.data._id}`,
-            officeUploadData,
-            true
-          );
-          if (updateShop.data.status !== 200) throw error(updateShop.msg);
-          success("User and Shop created successfully");
-          navigate("/login");
-        } else if (canSubmit) {
-          error("Some problems in form");
-          setCanSubmit(false);
-        }
-      } catch (err) {
-        console.log(err);
+        const updateShop = await http.updateItem(
+          `shop/${createShop.data.data._id}`,
+          officeUploadData,
+          true
+        );
+        if (updateShop.data.status !== 200) throw error(updateShop.msg);
+        success("User and Shop created successfully");
+        navigate("/login");
+      } else if (canSubmit) {
+        error("Some problems in form");
+        setCanSubmit(false);
       }
-    };
-    uploadForm();
+    } catch (err) {
+      error(err);
+    }
+  };
+
+  tempUploadForm.current = uploadForm;
+
+  useEffect(() => {
+    // uploadForm();
+    tempUploadForm.current();
   }, [userValueError, officeValueError]);
 
   return (

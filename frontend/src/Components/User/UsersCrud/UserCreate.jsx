@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../../Inputs/inputs";
 import { HttpClient } from "../../../utils/httpClients";
@@ -40,11 +40,20 @@ export default function UserCreate() {
   const allClients = useSelector((state) => state.office.client_id);
   let updatedAllUsers = [];
 
-  useEffect(() => {
+  const tempSetShopId = useRef();
+  const tempSendValue = useRef();
+
+  const setShopId = () => {
     setUserValue({
       ...userValue,
       shop_id: shop_id,
     });
+  };
+
+  tempSetShopId.current = setShopId;
+
+  useEffect(() => {
+    tempSetShopId.current();
   }, []);
 
   const handleChange = (event) => {
@@ -58,13 +67,18 @@ export default function UserCreate() {
     setCanSubmit(true);
   };
 
-  useEffect(() => {
+  const sendValue = () => {
     if (Object.keys(userValueError).length === 0 && canSubmit) {
       uploadForm();
     } else if (canSubmit) {
       error("Some things are left!");
       setCanSubmit(false);
     }
+  };
+  tempSendValue.current = sendValue;
+
+  useEffect(() => {
+    tempSendValue.current();
   }, [userValueError]);
 
   const uploadForm = () => {

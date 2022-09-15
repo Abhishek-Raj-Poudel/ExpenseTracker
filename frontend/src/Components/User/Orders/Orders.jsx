@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { FiPlus, FiToggleLeft, FiToggleRight } from "react-icons/fi";
+import React, { useEffect, useState, useRef } from "react";
+import { FiPlus } from "react-icons/fi";
 import { NavLink } from "react-router-dom";
 
 // redux
@@ -29,12 +29,14 @@ export default function Orders() {
   const http = new HttpClient();
   const dispatch = useDispatch();
 
+  const tempGetAllOrders = useRef();
+
   useEffect(() => {
-    getAllOrders();
+    tempGetAllOrders.current();
   }, [SHOP]);
 
   const getAllOrders = () => {
-    SHOP.order_id.map((obj) => {
+    SHOP.order_id.map((obj) =>
       http
         .getItemById(`order/${obj}`)
         .then((response) => {
@@ -51,9 +53,11 @@ export default function Orders() {
         })
         .catch((error) => {
           error(error);
-        });
-    });
+        })
+    );
   };
+
+  tempGetAllOrders.current = getAllOrders;
 
   const orderSorting = (responseValue) => {
     if (USER.role === "Head") {

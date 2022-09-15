@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Input } from "../../Inputs/inputs";
@@ -44,7 +44,10 @@ export default function OrdersCreate() {
   let allOrdersArr = [];
   let clientNameArr = [];
 
-  useEffect(() => {
+  const tempSubmitValue = useRef();
+  const tempGetAllClients = useRef();
+
+  const getAllClients = () => {
     SHOP.client_id.map(async (obj) => {
       try {
         const response = await http.getItemById(`user/${obj}`);
@@ -57,15 +60,19 @@ export default function OrdersCreate() {
         error("client not found ");
       }
     });
+  };
+
+  tempGetAllClients.current = getAllClients;
+
+  useEffect(() => {
+    tempGetAllClients.current();
   }, [orderValue.client_id]);
 
   const handleChange = (event) => {
     const { name, value, type, files } = event.target;
     if (type === "file") {
       let fileToUpload = [];
-      Object.keys(files).map((key) => {
-        fileToUpload.push(files[key]);
-      });
+      Object.keys(files).map((key) => fileToUpload.push(files[key]));
       setFilesToUpload(fileToUpload);
     } else {
       setOrderValue({ ...orderValue, [name]: value });
@@ -77,13 +84,20 @@ export default function OrdersCreate() {
     setCanSubmit(true);
   };
 
-  useEffect(() => {
+  const submitValue = () => {
     if (Object.keys(orderValueErr).length === 0 && canSubmit) {
       uploadForm();
     } else if (canSubmit) {
       error("Some things are left!");
       setCanSubmit(false);
     }
+  };
+
+  tempSubmitValue.current = submitValue;
+
+  useEffect(() => {
+    // submitValue();
+    tempSubmitValue.current();
   }, [orderValueErr]);
 
   const uploadForm = async () => {
@@ -115,7 +129,6 @@ export default function OrdersCreate() {
   const deleteImageFromState = (index) => {
     let images = [...filesToUpload];
     images.splice(index, 1);
-    console.log(images);
     setFilesToUpload(() => {
       return images;
     });

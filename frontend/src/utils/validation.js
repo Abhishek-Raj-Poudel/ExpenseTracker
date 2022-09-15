@@ -21,6 +21,7 @@ export const validate = (values) => {
   });
   return errors;
 };
+
 export const orderValidate = (values) => {
   const errors = {};
   !values.client_name && (errors.client_name = "Client Name is required !!");

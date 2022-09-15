@@ -1,12 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Home() {
-  const [isOn, setIsOn] = useState(false);
-  useEffect(() => {
-    return console.log(isOn);
-  }, [isOn]);
-
   return (
     <>
       <h2>Welcome to Office Management System</h2>

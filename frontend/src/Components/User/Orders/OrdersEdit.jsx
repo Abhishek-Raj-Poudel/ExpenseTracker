@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Input } from "../../Inputs/inputs";
 import Toggle from "../../Inputs/Toggle";
@@ -44,7 +44,10 @@ export default function OrdersEdit() {
 
   const http = new HttpClient();
 
-  useEffect(() => {
+  const tempGetAllClients = useRef();
+  const tempSubmitValue = useRef();
+
+  const getAllClients = () => {
     http
       .getItemById(`order/${param.id}`, true)
       .then((response) => {
@@ -56,11 +59,7 @@ export default function OrdersEdit() {
         error(error);
       });
 
-    getAllClients();
-  }, []);
-
-  const getAllClients = () => {
-    SHOP.client_id.map((obj) => {
+    SHOP.client_id.map((obj) =>
       http
         .getItemById(`user/${obj}`)
         .then((response) => {
@@ -75,20 +74,22 @@ export default function OrdersEdit() {
         })
         .catch((error) => {
           error(error);
-        });
-    });
+        })
+    );
   };
+
+  tempGetAllClients.current = getAllClients;
+
+  useEffect(() => {
+    tempGetAllClients.current();
+  }, []);
 
   const handleChange = (event) => {
     const { name, value, type, files } = event.target;
     if (type === "file") {
       let fileToUpload = [];
-      Object.keys(files).map((key) => {
-        fileToUpload.push(files[key]);
-      });
-      console.log(orderValue.old_image);
+      Object.keys(files).map((key) => fileToUpload.push(files[key]));
       if (!orderValue.old_image) {
-        console.log("old image updated " + orderValue.old_image);
         setOrderValue((prev) => {
           return { ...prev, old_image: prev.image, image: "" };
         });
@@ -110,13 +111,19 @@ export default function OrdersEdit() {
     setCanSubmit(true);
   };
 
-  useEffect(() => {
+  const submitValue = () => {
     if (Object.keys(orderValueError).length === 0 && canSubmit) {
       updateForm();
     } else if (canSubmit) {
       error("Some things are left!");
       setCanSubmit(false);
     }
+  };
+
+  tempSubmitValue.current = submitValue;
+
+  useEffect(() => {
+    tempSubmitValue.current();
   }, [orderValueError]);
 
   const updateForm = async () => {
@@ -145,11 +152,9 @@ export default function OrdersEdit() {
   const deleteImageFromState = (index) => {
     let images = [...filesToUpload];
     images.splice(index, 1);
-    console.log(images);
     setFilesToUpload(() => {
       return images;
     });
-    console.log(filesToUpload);
   };
 
   return (

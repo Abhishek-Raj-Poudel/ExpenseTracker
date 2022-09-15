@@ -8,7 +8,6 @@ const InputStyle = styled.div`
 `;
 
 export function Input({ name, label, type, required, handleChange, value }) {
-  // console.log("handleChange", handleChange);
   return (
     <InputStyle>
       <label>{label}</label>
@@ -21,20 +20,5 @@ export function Input({ name, label, type, required, handleChange, value }) {
         required={required}
       />
     </InputStyle>
-  );
-}
-export function Select({ label, name, parentId, options, required }) {
-  return (
-    <>
-      <label>{label}</label>{" "}
-      <select name={name} id={name} required={required}>
-        <option value="">--Select Any One--</option>
-        {options.map((obj, index) => (
-          <option key={index} value={obj._id ? obj._id : obj}>
-            {obj.name ? obj.name : obj}
-          </option>
-        ))}
-      </select>
-    </>
   );
 }

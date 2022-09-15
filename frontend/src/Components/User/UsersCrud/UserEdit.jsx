@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Input } from "../../Inputs/inputs";
 import { HttpClient } from "../../../utils/httpClients";
@@ -29,7 +29,14 @@ export default function UserEdit() {
 
   const http = new HttpClient();
 
+  const tempGetUserValue = useRef();
+  const tempSubmitValue = useRef();
+
   useEffect(() => {
+    tempGetUserValue.current();
+  }, [param.id]);
+
+  const getUserValue = () => {
     http
       .getItemById(`user/${param.id}`, true)
       .then((response) => {
@@ -40,12 +47,13 @@ export default function UserEdit() {
       .catch((error) => {
         error(error);
       });
-  }, []);
+  };
+
+  tempGetUserValue.current = getUserValue;
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setUserValue({ ...userValue, [name]: value });
-    console.log("here");
   };
 
   const validate = (values) => {
@@ -64,20 +72,26 @@ export default function UserEdit() {
 
     return errors;
   };
-
   const handleSubmit = (event) => {
     event.preventDefault();
     setUserValueError(validate(userValue));
     setCanSubmit(true);
   };
 
-  useEffect(() => {
+  const submitValue = () => {
     if (Object.keys(userValueError).length === 0 && canSubmit) {
       updateForm();
     } else if (canSubmit) {
       error("Some things are left!");
       setCanSubmit(false);
+      console.log(userValueError);
     }
+  };
+
+  tempSubmitValue.current = submitValue;
+
+  useEffect(() => {
+    tempSubmitValue.current();
   }, [userValueError]);
 
   const updateForm = () => {

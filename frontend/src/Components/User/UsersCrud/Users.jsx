@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { HttpClient } from "../../../utils/httpClients";
 import { FiPlus } from "react-icons/fi";
 import { NavLink } from "react-router-dom";
@@ -12,7 +12,6 @@ import {
 } from "../../../Redux/Office/officeAction";
 import Flexbox from "../../../Styles/Flexbox";
 import { error, success } from "../../../utils/utils";
-// import { TableComponent } from "../Utilities/Tables";
 
 export default function Users() {
   // Redux
@@ -28,13 +27,10 @@ export default function Users() {
   let allStaffArr = [];
   let allClientsArr = [];
 
-  useEffect(() => {
-    getAllStaffs();
-    getAllClients();
-  }, [shop]);
+  const tempGetAllValues = useRef();
 
-  const getAllStaffs = () => {
-    shop.staff_id.map((obj) => {
+  const getAllValues = () => {
+    shop.staff_id.map((obj) =>
       http
         .getItemById(`user/${obj}`)
         .then((response) => {
@@ -49,11 +45,10 @@ export default function Users() {
         })
         .catch((error) => {
           error(error);
-        });
-    });
-  };
-  const getAllClients = () => {
-    shop.client_id.map((obj) => {
+        })
+    );
+
+    shop.client_id.map((obj) =>
       http
         .getItemById(`user/${obj}`)
         .then((response) => {
@@ -68,9 +63,15 @@ export default function Users() {
         })
         .catch((error) => {
           error(error);
-        });
-    });
+        })
+    );
   };
+
+  tempGetAllValues.current = getAllValues;
+
+  useEffect(() => {
+    tempGetAllValues.current();
+  }, [shop]);
 
   const deleteStaff = (id) => {
     let updatedStaffArr = shop.staff_id.filter((user) => user !== id);

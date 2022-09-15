@@ -63,8 +63,6 @@ function updateDataById(request, response, Model, data, outputName) {
         if (error) {
           response.json({ msg: `No such image ${old_image}` });
         }
-
-        console.log("File deleted successfully");
       });
     }
     Model.updateOne({ _id: id }, { $set: data }, { upsert: true })
@@ -110,7 +108,6 @@ const deleteOrder = async (request, response, Model, outputName) => {
     await Model.deleteOne({ _id: id });
     successResponse(response, true);
   } catch (error) {
-    console.log(error);
     errorResponse(response, error);
   }
 };
@@ -138,7 +135,6 @@ const updateImage = (request, data, path) => {
     let old_images = data.image;
     let images = [];
     if (old_images) {
-      console.log("here " + old_images);
       images = old_images.split(",");
     }
 
@@ -150,7 +146,6 @@ const updateImage = (request, data, path) => {
               images.push(files[file][j].filename);
             } else {
               data[path[i]] = files[file][j].filename;
-              console.log("here");
             }
           }
         }
