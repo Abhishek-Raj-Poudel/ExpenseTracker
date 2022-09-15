@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../../Inputs/inputs";
 import { HttpClient } from "../../../utils/httpClients";
@@ -15,6 +15,7 @@ import Flexbox from "../../../Styles/Flexbox";
 import Form from "../../../Styles/Form";
 import { error, success } from "../../../utils/utils";
 import { TextDanger } from "../../../Styles/Texts";
+import { validate } from "../../../utils/validation";
 
 export default function UserCreate() {
   const commonUserFields = {
@@ -24,20 +25,36 @@ export default function UserCreate() {
     re_password: "",
     gender: "",
     role: "",
-    shop_id: null,
   };
   const [userValue, setUserValue] = useState(commonUserFields);
-  const [userValueError, setUserValueError] = useState(commonUserFields);
+  const [userValueError, setUserValueError] = useState({});
+  const [canSubmit, setCanSubmit] = useState(false);
   const navigate = useNavigate();
   const http = new HttpClient();
 
   //Redux stuff
   const dispatch = useDispatch();
   const shop_id = useSelector((state) => state.user.shop_id);
-  const shop = useSelector((state) => state.office);
+  const SHOP = useSelector((state) => state.office);
   const allStaffs = useSelector((state) => state.office.staff_id);
   const allClients = useSelector((state) => state.office.client_id);
   let updatedAllUsers = [];
+
+  const tempSetShopId = useRef();
+  const tempSendValue = useRef();
+
+  const setShopId = () => {
+    setUserValue({
+      ...userValue,
+      shop_id: shop_id,
+    });
+  };
+
+  tempSetShopId.current = setShopId;
+
+  useEffect(() => {
+    tempSetShopId.current();
+  }, []);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -47,53 +64,22 @@ export default function UserCreate() {
   const handleSubmit = (event) => {
     event.preventDefault();
     setUserValueError(validate(userValue));
-    if (Object.keys(userValueError).length === 0) {
-      uploadForm();
-    } else {
-      error(
-        "Not Ready To Upload because ",
-        "user error=",
-        Object.keys(userValueError).length
-      );
-    }
+    setCanSubmit(true);
   };
 
-  const validate = (values) => {
-    const errors = {};
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i; //find out about regex
-    if (!values.name) {
-      errors.name = "Name is required!";
+  const sendValue = () => {
+    if (Object.keys(userValueError).length === 0 && canSubmit) {
+      uploadForm();
+    } else if (canSubmit) {
+      error("Some things are left!");
+      setCanSubmit(false);
     }
-    if (!values.email) {
-      errors.email = "Email is required!";
-    } else if (!regex.test(values.email)) {
-      errors.email = "This is not a valid email format!";
-    }
-    if (!values.password) {
-      errors.password = "Password is required";
-    } else if (values.password.length < 4) {
-      errors.password = "Password must be more than 4 characters";
-    }
-    if (!values.re_password) {
-      errors.re_password = "re-password is required";
-    } else if (!values.re_password === values.password) {
-      errors.re_password = "Password didn't match";
-    }
-    if (!values.gender) {
-      errors.gender = "Please select gender";
-    }
-    if (!values.role) {
-      errors.role = "Role is required";
-    }
-    return errors;
   };
+  tempSendValue.current = sendValue;
 
   useEffect(() => {
-    setUserValue({
-      ...userValue,
-      shop_id: shop_id,
-    });
-  }, []);
+    tempSendValue.current();
+  }, [userValueError]);
 
   const uploadForm = () => {
     if (userValue.shop_id) {
@@ -125,12 +111,12 @@ export default function UserCreate() {
       http
         .updateItem(
           `shop/${shop_id}`,
-          { ...shop, client_id: updatedAllUsers },
+          { ...SHOP, client_id: updatedAllUsers },
           true
         )
         .then((response) => {
           success(response.data.msg);
-          dispatch(fetchOfficeSuccess({ ...shop, client_id: updatedAllUsers }));
+          dispatch(fetchOfficeSuccess({ ...SHOP, client_id: updatedAllUsers }));
         })
         .catch((error) => {
           error(error);
@@ -140,12 +126,12 @@ export default function UserCreate() {
       http
         .updateItem(
           `shop/${shop_id}`,
-          { ...shop, staff_id: updatedAllUsers },
+          { ...SHOP, staff_id: updatedAllUsers },
           true
         )
         .then((response) => {
           success(response.data.msg);
-          dispatch(fetchOfficeSuccess({ ...shop, staff_id: updatedAllUsers }));
+          dispatch(fetchOfficeSuccess({ ...SHOP, staff_id: updatedAllUsers }));
         })
         .catch((error) => {
           error(error);
@@ -160,7 +146,7 @@ export default function UserCreate() {
     <>
       <Flexbox column align="center">
         <h1>Create a User</h1>
-        <Form>
+        <Form action="submit">
           <Input label="Name" name="name" handleChange={handleChange} />
           <TextDanger>{userValueError.name}</TextDanger>
           <Input
@@ -173,11 +159,13 @@ export default function UserCreate() {
           <label>Role</label>
           <select name="role" type="role" onChange={handleChange}>
             <option value="">--Select A Role--</option>
-            <option value="Client">Client</option>
-            <option value="Accountant">Accountant</option>
-            <option value="Designer">Designer</option>
-            <option value="Writer">Writer</option>
-            <option value="Writer">Staff</option>
+            {SHOP &&
+              SHOP.roles &&
+              SHOP.roles.map((role, index) => (
+                <option key={index} value={role}>
+                  {role}
+                </option>
+              ))}
           </select>
           <TextDanger>{userValueError.role}</TextDanger>
           <label>Gender</label>

@@ -5,7 +5,6 @@ const {
   addData,
   getDataById,
   updateDataById,
-  deleteDataById,
   uploadImage,
   deleteOrder,
 } = require("../controller/baseController");
@@ -32,7 +31,6 @@ router
   })
   .put(uploader.single("image"), (req, res, next) => {
     let data = req.body;
-    console.log(req.body.image);
     data = uploadImage(req, data, "image");
     updateDataById(req, res, OrderModel, data, orderOutput);
   })

@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { HttpClient } from "../../../utils/httpClients";
-import { FaPen, FaPlus, FaTrash } from "react-icons/fa";
+import { FiPlus } from "react-icons/fi";
 import { NavLink } from "react-router-dom";
+import { Action } from "../Utilities/action";
 
 // redux
 import { useSelector, useDispatch } from "react-redux";
@@ -10,7 +11,6 @@ import {
   fetchOfficeFaliure,
 } from "../../../Redux/Office/officeAction";
 import Flexbox from "../../../Styles/Flexbox";
-import { ButtonDanger } from "../../../Styles/Button";
 import { error, success } from "../../../utils/utils";
 
 export default function Users() {
@@ -27,13 +27,10 @@ export default function Users() {
   let allStaffArr = [];
   let allClientsArr = [];
 
-  useEffect(() => {
-    getAllStaffs();
-    getAllClients();
-  }, [shop]);
+  const tempGetAllValues = useRef();
 
-  const getAllStaffs = () => {
-    shop.staff_id.map((obj) => {
+  const getAllValues = () => {
+    shop.staff_id.map((obj) =>
       http
         .getItemById(`user/${obj}`)
         .then((response) => {
@@ -48,11 +45,10 @@ export default function Users() {
         })
         .catch((error) => {
           error(error);
-        });
-    });
-  };
-  const getAllClients = () => {
-    shop.client_id.map((obj) => {
+        })
+    );
+
+    shop.client_id.map((obj) =>
       http
         .getItemById(`user/${obj}`)
         .then((response) => {
@@ -67,9 +63,15 @@ export default function Users() {
         })
         .catch((error) => {
           error(error);
-        });
-    });
+        })
+    );
   };
+
+  tempGetAllValues.current = getAllValues;
+
+  useEffect(() => {
+    tempGetAllValues.current();
+  }, [shop]);
 
   const deleteStaff = (id) => {
     let updatedStaffArr = shop.staff_id.filter((user) => user !== id);
@@ -142,7 +144,7 @@ export default function Users() {
 
         <NavLink to="create">
           <button>
-            <FaPlus /> Add User
+            <FiPlus />
           </button>
         </NavLink>
       </Flexbox>
@@ -169,26 +171,12 @@ export default function Users() {
               <td>{obj.role}</td>
               <td>{obj._id}</td>
               <td>
-                <Flexbox
-                  justify="flex-start"
-                  align="center"
-                  gap="1rem"
-                  padding="12pxc"
-                >
-                  <NavLink to={`edit=${obj._id}`}>
-                    <Flexbox align="center">
-                      <FaPen></FaPen>
-                      <span>Edit</span>
-                    </Flexbox>
-                  </NavLink>
-                  <ButtonDanger
-                    onClick={(event) => {
-                      return deleteStaff(obj._id);
-                    }}
-                  >
-                    <FaTrash></FaTrash>
-                  </ButtonDanger>
-                </Flexbox>
+                <Action
+                  obj={obj}
+                  handleClick={() => {
+                    return deleteStaff(obj._id);
+                  }}
+                />
               </td>
             </tr>
           ))}
@@ -217,26 +205,12 @@ export default function Users() {
               <td>{obj.role}</td>
               <td>{obj._id}</td>
               <td>
-                <Flexbox
-                  justify="flex-start"
-                  align="center"
-                  gap="1rem"
-                  padding="12pxc"
-                >
-                  <NavLink to={`edit=${obj._id}`}>
-                    <Flexbox align="center">
-                      <FaPen></FaPen>
-                      <span>Edit</span>
-                    </Flexbox>
-                  </NavLink>
-                  <ButtonDanger
-                    onClick={(event) => {
-                      return deleteClient(obj._id);
-                    }}
-                  >
-                    <FaTrash></FaTrash>
-                  </ButtonDanger>
-                </Flexbox>
+                <Action
+                  obj={obj}
+                  handleClick={() => {
+                    return deleteClient(obj._id);
+                  }}
+                />
               </td>
             </tr>
           ))}

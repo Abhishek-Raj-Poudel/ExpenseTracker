@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Input } from "../../Inputs/inputs";
@@ -15,6 +15,8 @@ import Flexbox from "../../../Styles/Flexbox";
 import { success, error } from "../../../utils/utils";
 import { ButtonDanger } from "../../../Styles/Button";
 import { FiX } from "react-icons/fi";
+import { orderValidate } from "../../../utils/validation";
+import { TextDanger } from "../../../Styles/Texts";
 
 export default function OrdersCreate() {
   const commonFields = {
@@ -30,50 +32,47 @@ export default function OrdersCreate() {
   const [orderValueErr, setOrderValueErr] = useState(commonFields);
   const [filesToUpload, setFilesToUpload] = useState([]);
   const [clients, setClients] = useState([]);
+  const [canSubmit, setCanSubmit] = useState(false);
 
   const navigate = useNavigate();
   const http = new HttpClient();
 
   //Redux Stuff
   const dispatch = useDispatch();
-  const shop = useSelector((state) => state.office);
-  const shop_id = useSelector((state) => state.user.shop_id);
-
+  const SHOP = useSelector((state) => state.office);
+  const SHOP_ID = useSelector((state) => state.user.shop_id);
   let allOrdersArr = [];
   let clientNameArr = [];
 
-  useEffect(() => {
-    getAllClients();
-  }, [orderValue.client_id]);
+  const tempSubmitValue = useRef();
+  const tempGetAllClients = useRef();
 
   const getAllClients = () => {
-    shop.client_id.map((obj) => {
-      http
-        .getItemById(`user/${obj}`)
-        .then((response) => {
-          let responseValue = response.data.data;
-
-          if (responseValue) {
-            clientNameArr.push(responseValue);
-            setClients([...clientNameArr]);
-          } else {
-            error("client not found ");
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          error(error);
-        });
+    SHOP.client_id.map(async (obj) => {
+      try {
+        const response = await http.getItemById(`user/${obj}`);
+        let responseValue = response.data.data;
+        if (responseValue) {
+          clientNameArr.push(responseValue);
+          setClients([...clientNameArr]);
+        }
+      } catch (error) {
+        error("client not found ");
+      }
     });
   };
 
+  tempGetAllClients.current = getAllClients;
+
+  useEffect(() => {
+    tempGetAllClients.current();
+  }, [orderValue.client_id]);
+
   const handleChange = (event) => {
     const { name, value, type, files } = event.target;
-    if (type == "file") {
+    if (type === "file") {
       let fileToUpload = [];
-      Object.keys(files).map((key) => {
-        fileToUpload.push(files[key]);
-      });
+      Object.keys(files).map((key) => fileToUpload.push(files[key]));
       setFilesToUpload(fileToUpload);
     } else {
       setOrderValue({ ...orderValue, [name]: value });
@@ -81,49 +80,58 @@ export default function OrdersCreate() {
   };
   const handleSubmit = (event) => {
     event.preventDefault();
-    uploadForm();
+    setOrderValueErr(orderValidate(orderValue));
+    setCanSubmit(true);
   };
 
-  const uploadForm = () => {
-    http
-      .uploader(orderValue, filesToUpload, "POST", "order", true)
-      .then((response) => {
-        allOrdersArr = [...shop.order_id, response.data._id];
-        success(response.msg);
-        updateOrderListInShop(allOrdersArr);
-      })
-      .catch((error) => {
-        error(error);
-      });
+  const submitValue = () => {
+    if (Object.keys(orderValueErr).length === 0 && canSubmit) {
+      uploadForm();
+    } else if (canSubmit) {
+      error("Some things are left!");
+      setCanSubmit(false);
+    }
   };
 
-  const updateOrderListInShop = (value) => {
-    const uploadValue = { ...shop, order_id: value };
-    http
-      .updateItem(`shop/${shop_id}`, uploadValue)
-      .then((response) => {
-        if (response.data.status === 200) {
-          success(response.data.msg);
-          dispatch(fetchOfficeSuccess(uploadValue));
-          navigate("/user/orders");
-        } else {
-          error(response.data.msg);
-        }
-      })
-      .catch((error) => {
-        error(error);
-        dispatch(fetchOfficeFaliure(error.msg));
-      });
+  tempSubmitValue.current = submitValue;
+
+  useEffect(() => {
+    // submitValue();
+    tempSubmitValue.current();
+  }, [orderValueErr]);
+
+  const uploadForm = async () => {
+    try {
+      const updateOrder = await http.uploader(
+        orderValue,
+        filesToUpload,
+        "POST",
+        "order",
+        true
+      );
+      allOrdersArr = [...SHOP.order_id, updateOrder.data._id];
+      success(updateOrder.msg);
+
+      const uploadValue = { ...SHOP, order_id: allOrdersArr };
+      const updateOrderListInShop = await http.updateItem(
+        `shop/${SHOP_ID}`,
+        uploadValue
+      );
+      success(updateOrderListInShop.data.msg);
+      dispatch(fetchOfficeSuccess(uploadValue));
+      navigate("/user/orders");
+    } catch (error) {
+      error(error.msg);
+      dispatch(fetchOfficeFaliure(error.msg));
+    }
   };
 
   const deleteImageFromState = (index) => {
     let images = [...filesToUpload];
     images.splice(index, 1);
-    console.log(images);
-    setFilesToUpload((prev) => {
+    setFilesToUpload(() => {
       return images;
     });
-    console.log(filesToUpload);
   };
 
   return (
@@ -137,7 +145,7 @@ export default function OrdersCreate() {
             value={orderValue.client_name}
             handleChange={handleChange}
           ></Input>
-          <span>{orderValueErr.client_name}</span>
+          <TextDanger>{orderValueErr.client_name}</TextDanger>
 
           <label>Client</label>
           <select name="client_id" onChange={handleChange}>
@@ -148,24 +156,27 @@ export default function OrdersCreate() {
               </option>
             ))}
           </select>
-          <span>{orderValueErr.client_id}</span>
+          <TextDanger>{orderValueErr.client_id}</TextDanger>
 
           <Input
             label="Produce Name"
             name="products_name"
             handleChange={handleChange}
           />
-          <span>{orderValueErr.product_id}</span>
+          <TextDanger>{orderValueErr.products_name}</TextDanger>
 
           <label>Assigned To</label>
           <select name="assigned_to" onChange={handleChange}>
             <option value="">---Assigned to--- </option>
-            <option value="Accountant">Accountant</option>
-            <option value="Designer">Designer</option>
-            <option value="Writer">Writer</option>
-            <option value="Writer">Staff</option>
+            {SHOP &&
+              SHOP.roles &&
+              SHOP.roles.map((role, index) => (
+                <option key={index} value={role}>
+                  {role}
+                </option>
+              ))}
           </select>
-          <span>{orderValueErr.assigned_to}</span>
+          <TextDanger>{orderValueErr.assigned_to}</TextDanger>
 
           <Input
             label="Total Price"
@@ -173,7 +184,6 @@ export default function OrdersCreate() {
             type="number"
             handleChange={handleChange}
           />
-          <span>{orderValueErr.product_id}</span>
           <label>Recipt </label>
           <input type="file" onChange={handleChange} name="image" />
           <Flexbox column>

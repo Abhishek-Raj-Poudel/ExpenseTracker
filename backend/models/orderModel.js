@@ -19,8 +19,7 @@ const OrderSchema = new mongoose.Schema(
 
     assigned_to: {
       type: String,
-      enum: ["Accountant", "Designer", "Staff", "Writer"],
-      default: "Staff",
+      required: true,
     },
     image: String,
     total_price: {
@@ -29,6 +28,7 @@ const OrderSchema = new mongoose.Schema(
     },
 
     paid: { type: Boolean, default: false },
+    done: { type: Boolean, default: false },
   },
   {
     timestamps: true,

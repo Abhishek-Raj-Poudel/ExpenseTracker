@@ -117,6 +117,17 @@ export default function AppRouting() {
               </PrivateRoute>
             }
           />
+          {/* All Roles */}
+          <Route
+            path="roles"
+            element={
+              <PrivateRoute>
+                <UserType>
+                  <User.Roles></User.Roles>
+                </UserType>
+              </PrivateRoute>
+            }
+          />
         </Route>
         <Route path="/logout" element={<Logout />} />
       </Routes>

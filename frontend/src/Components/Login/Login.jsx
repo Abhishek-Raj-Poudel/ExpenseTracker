@@ -84,7 +84,6 @@ export default function Login() {
       })
       .catch((error) => {
         dispatch(fetchUserFaliure(error));
-        console.log("LoginError ", error);
       });
   };
 

@@ -8,10 +8,9 @@ const InputStyle = styled.div`
 `;
 
 export function Input({ name, label, type, required, handleChange, value }) {
-  // console.log("handleChange", handleChange);
   return (
     <InputStyle>
-      <label>{label}</label>{" "}
+      <label>{label}</label>
       <input
         name={name}
         type={type ? type : name}

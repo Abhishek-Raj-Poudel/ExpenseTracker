@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
 import { Input } from "../Inputs/inputs";
 import { HttpClient } from "../../utils/httpClients";
-
+import { validate } from "../../utils/validation";
 // style
-import Card from "../../Styles/Form";
 import Flexbox from "../../Styles/Flexbox";
 import { TextDanger } from "../../Styles/Texts";
-import { error } from "../../utils/utils";
+import { error, success } from "../../utils/utils";
+import Form from "../../Styles/Form";
 
 function Register() {
   const commonUserFields = {
@@ -24,11 +24,12 @@ function Register() {
     service: "",
   };
   const [userValue, setUserValue] = useState(commonUserFields);
-  const [userValueError, setUserValueError] = useState(commonUserFields);
+  const [userValueError, setUserValueError] = useState({});
   const [officeValue, setOfficeValue] = useState(commonOfficeFields);
-  const [officeValueError, setOfficeValueError] = useState(commonOfficeFields);
+  const [officeValueError, setOfficeValueError] = useState({});
   const [canSubmit, setCanSubmit] = useState(false);
-  const [canOfficeSubmit, setCanOfficeSubmit] = useState(false);
+
+  const tempUploadForm = useRef();
 
   const navigate = useNavigate();
 
@@ -47,140 +48,67 @@ function Register() {
   const handleSubmit = (event) => {
     event.preventDefault();
     setUserValueError(validate(userValue));
-    setOfficeValueError(officeFormValidate(officeValue));
-    if (
-      Object.keys(officeValueError).length === 0 &&
-      Object.keys(userValueError).length === 0
-    ) {
-      uploadForm();
-    } else {
-      error("Some fields are left");
-    }
+    setOfficeValueError(validate(officeValue));
+    setCanSubmit(true);
   };
 
-  const validate = (values) => {
-    const errors = {};
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i; //find out about regex
-    if (!values.name) {
-      errors.name = "Name is required!";
-    }
-    if (!values.email) {
-      errors.email = "Email is required!";
-    } else if (!regex.test(values.email)) {
-      errors.email = "This is not a valid email format!";
-    }
-    if (!values.password) {
-      errors.password = "Password is required";
-    } else if (values.password.length < 4) {
-      errors.password = "Password must be more than 4 characters";
-    }
-    if (!values.re_password) {
-      errors.re_password = "re-password is required";
-    } else if (!values.re_password === values.password) {
-      errors.re_password = "Password didn't match";
-    }
-    if (!values.gender) {
-      errors.gender = "Please select gender";
-    }
-    if (!values.role) {
-      errors.role = "Role is required";
-    }
-    return errors;
-  };
-
-  const officeFormValidate = (values) => {
-    const errors = {};
-    if (!values.name) {
-      errors.name = "Name is required!";
-    }
-    if (!values.service) {
-      errors.service = "Service is required";
-    }
-    return errors;
-  };
-
-  const uploadForm = () => {
-    http
-      .postItem("shop", officeValue, {
-        "Access-Control-Allow-Origin": "*",
-        "content-type": "application/json",
-      })
-      .then((response) => {
-        if (response.status === 200) {
-          setUserValue({ ...userValue, shop_id: response.data.data._id });
-
-          console.log("User Value ", userValue);
-          console.log("Shop data Uploaded ", response.data.data);
-          setCanSubmit(true);
-          // success(response.data.msg);
-        } else {
-          // error(response.data.msg);
-          console.log(response.data.msg);
-        }
-      })
-      .catch((error) => {
-        console.log("Error: ", error.msg);
-      });
-  };
-  useEffect(() => {
-    if (canSubmit) {
-      http
-        .postItem("user", userValue, {
+  const uploadForm = async () => {
+    try {
+      if (
+        Object.keys(officeValueError).length === 0 &&
+        Object.keys(userValueError).length === 0 &&
+        canSubmit
+      ) {
+        const createShop = await http.postItem("shop", officeValue, {
           "Access-Control-Allow-Origin": "*",
           "content-type": "application/json",
-        })
-        .then((response) => {
-          if (response.data.status === 200) {
-            setOfficeValue({
-              ...officeValue,
-              staff_id: [response.data.data._id],
-            });
-            setCanSubmit(false);
-            setCanOfficeSubmit(true);
-          } else {
-            console.log(response.data.msg);
-            setCanSubmit(false);
-          }
-        })
-        .catch((error) => {
-          console.log("Error: ", error);
-          setCanSubmit(false);
         });
-    } else {
-      console.log("cant submit because canSubmit is ", canSubmit);
-    }
+        if (createShop.status !== 200) throw error(createShop.msg);
+        const userUploadData = {
+          ...userValue,
+          shop_id: createShop.data.data._id,
+        };
+        const createUser = await http.postItem("user", userUploadData, {
+          "Access-Control-Allow-Origin": "*",
+          "content-type": "application/json",
+        });
 
-    if (canOfficeSubmit) {
-      console.log("User data ", userValue);
-      console.log("shop data ", officeValue);
-      http
-        .updateItem(`shop/${userValue.shop_id}`, officeValue, true)
-        .then((response) => {
-          if (response.data.status === 200) {
-            // setUserValue({ ...officeValue, user_id: [response.data.data._id] });
-            console.log("User Value updated ", response.data.data);
-            setCanOfficeSubmit(false);
-            // localStorage.setItem("register_success", true);
-            navigate("/login");
-          } else {
-            // error(response.data.msg);
-            console.log(response.data.msg);
-            setCanOfficeSubmit(false);
-          }
-        })
-        .catch((error) => {
-          console.log("Error: ", error);
-          setCanOfficeSubmit(false);
-        });
-    } else {
-      console.log("cant submit office because canSubmit is ", canOfficeSubmit);
+        if (createUser.data.status !== 200) throw error(createUser.msg);
+        const officeUploadData = {
+          ...officeValue,
+          roles: ["Head", "Client"],
+          staff_id: [createUser.data.data._id],
+        };
+
+        const updateShop = await http.updateItem(
+          `shop/${createShop.data.data._id}`,
+          officeUploadData,
+          true
+        );
+        if (updateShop.data.status !== 200) throw error(updateShop.msg);
+        success("User and Shop created successfully");
+        navigate("/login");
+      } else if (canSubmit) {
+        error("Some problems in form");
+        setCanSubmit(false);
+      }
+    } catch (err) {
+      error(err);
     }
-  }, [canSubmit, canOfficeSubmit]);
+  };
+
+  tempUploadForm.current = uploadForm;
+
+  useEffect(() => {
+    // uploadForm();
+    tempUploadForm.current();
+  }, [userValueError, officeValueError]);
+
   return (
     <Flexbox column align="center">
       <h2>Register </h2>
       <Flexbox>
-        <Card>
+        <Form>
           <h3>User's Detail</h3>
           <Input
             label="Name"
@@ -226,8 +154,8 @@ function Register() {
           <TextDanger className="text-danger">
             {userValueError.gender}
           </TextDanger>
-        </Card>
-        <Card>
+        </Form>
+        <Form>
           <h3>User's Office</h3>
 
           <Input
@@ -252,7 +180,7 @@ function Register() {
           <button type="submit" onClick={handleSubmit}>
             Submit
           </button>
-        </Card>
+        </Form>
       </Flexbox>
     </Flexbox>
   );

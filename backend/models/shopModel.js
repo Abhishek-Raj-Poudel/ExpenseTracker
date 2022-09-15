@@ -23,6 +23,7 @@ const ShopSchema = new mongoose.Schema(
         default: null,
       },
     ],
+    roles: [String],
     client_id: [
       {
         type: mongoose.Types.ObjectId,
@@ -30,6 +31,7 @@ const ShopSchema = new mongoose.Schema(
         default: null,
       },
     ],
+    other_orders: [Object],
     service: {
       type: String,
       default: "Service",

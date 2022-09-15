@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Input } from "../../Inputs/inputs";
 import { HttpClient } from "../../../utils/httpClients";
@@ -8,6 +8,7 @@ import Form from "../../../Styles/Form";
 import Flexbox from "../../../Styles/Flexbox";
 import { TextDanger } from "../../../Styles/Texts";
 import { error, success } from "../../../utils/utils";
+import { useSelector } from "react-redux";
 
 export default function UserEdit() {
   const commonUserFields = {
@@ -18,13 +19,24 @@ export default function UserEdit() {
   };
   const [userValue, setUserValue] = useState(commonUserFields);
   const [userValueError, setUserValueError] = useState(commonUserFields);
+  const [canSubmit, setCanSubmit] = useState(false);
+
   // React Router
   const navigate = useNavigate();
   const param = useParams();
 
+  const SHOP = useSelector((state) => state.office);
+
   const http = new HttpClient();
 
+  const tempGetUserValue = useRef();
+  const tempSubmitValue = useRef();
+
   useEffect(() => {
+    tempGetUserValue.current();
+  }, [param.id]);
+
+  const getUserValue = () => {
     http
       .getItemById(`user/${param.id}`, true)
       .then((response) => {
@@ -35,48 +47,52 @@ export default function UserEdit() {
       .catch((error) => {
         error(error);
       });
-  }, []);
+  };
+
+  tempGetUserValue.current = getUserValue;
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setUserValue({ ...userValue, [name]: value });
-    setUserValueError(validate(userValue));
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setUserValueError(validate(userValue));
-    if (Object.keys(userValueError).length === 0) {
-      updateForm();
-    } else {
-      error(
-        "Not Ready To UPload because ",
-        "user error=",
-        Object.keys(userValueError).length
-      );
-      error(userValueError);
-    }
   };
 
   const validate = (values) => {
     const errors = {};
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i; //find out about regex
-    if (!values.name) {
-      errors.name = "Name is required!";
-    }
+
+    !values.name && (errors.name = "Name is required!");
+
     if (!values.email) {
       errors.email = "Email is required!";
     } else if (!regex.test(values.email)) {
       errors.email = "This is not a valid email format!";
     }
-    if (!values.gender) {
-      errors.gender = "Please select gender";
-    }
-    if (!values.role) {
-      errors.role = "Role is required";
-    }
+    !values.role && (errors.name = "Role is required!");
+    !values.gender && (errors.gender = "Please select gender");
+
     return errors;
   };
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setUserValueError(validate(userValue));
+    setCanSubmit(true);
+  };
+
+  const submitValue = () => {
+    if (Object.keys(userValueError).length === 0 && canSubmit) {
+      updateForm();
+    } else if (canSubmit) {
+      error("Some things are left!");
+      setCanSubmit(false);
+      console.log(userValueError);
+    }
+  };
+
+  tempSubmitValue.current = submitValue;
+
+  useEffect(() => {
+    tempSubmitValue.current();
+  }, [userValueError]);
 
   const updateForm = () => {
     http
@@ -94,7 +110,7 @@ export default function UserEdit() {
     <>
       <Flexbox column align="center">
         <h1>Edit a User</h1>
-        <Form>
+        <Form action="submit">
           <Input
             label="Name"
             name="name"
@@ -121,11 +137,13 @@ export default function UserEdit() {
             value={userValue.role}
           >
             <option value="">--Select A Role--</option>
-            <option value="Client">Client</option>
-            <option value="Accountant">Accountant</option>
-            <option value="Designer">Designer</option>
-            <option value="Writer">Writer</option>
-            <option value="Writer">Staff</option>
+            {SHOP &&
+              SHOP.roles &&
+              SHOP.roles.map((role, index) => (
+                <option key={index} value={role}>
+                  {role}
+                </option>
+              ))}
           </select>
 
           <TextDanger className="text-danger">{userValueError.role}</TextDanger>
@@ -146,7 +164,7 @@ export default function UserEdit() {
             {userValueError.gender}
           </TextDanger>
 
-          <button type="submit" onChange={handleSubmit}>
+          <button type="submit" onClick={handleSubmit}>
             Submit
           </button>
         </Form>

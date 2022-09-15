@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { FaPen, FaPlus, FaTrash } from "react-icons/fa";
-import { Link, NavLink } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+import { FiPlus } from "react-icons/fi";
+import { NavLink } from "react-router-dom";
 
 // redux
 import { useSelector, useDispatch } from "react-redux";
 import { fetchOfficeSuccess } from "../../../Redux/Office/officeAction";
 import Flexbox from "../../../Styles/Flexbox";
-import { ButtonDanger } from "../../../Styles/Button";
-
 //utilities
 import { HttpClient } from "../../../utils/httpClients";
 import { error, success } from "../../../utils/utils";
+import { Action } from "../Utilities/action";
+import { StyledText } from "../../../Styles/Texts";
+import { FiThumbsDown, FiThumbsUp } from "react-icons/fi";
+import Toggle from "../../Inputs/Toggle";
 
 export default function Orders() {
   // Redux
@@ -21,45 +23,66 @@ export default function Orders() {
 
   let [allOrders, setAllOrders] = useState([]);
   let allOrderArr = [];
+  let [completedOrders, setCompletedOrders] = useState([]);
+  let completedOrderArr = [];
 
   const http = new HttpClient();
   const dispatch = useDispatch();
 
+  const tempGetAllOrders = useRef();
+
   useEffect(() => {
-    getAllOrders();
+    tempGetAllOrders.current();
   }, [SHOP]);
 
   const getAllOrders = () => {
-    SHOP.order_id.map((obj) => {
+    SHOP.order_id.map((obj) =>
       http
         .getItemById(`order/${obj}`)
         .then((response) => {
           let responseValue = response.data.data;
           if (responseValue) {
             orderSorting(responseValue);
+            allOrderArr.sort((a, b) => Number(b.paid) - Number(a.paid));
+            completedOrderArr.sort((a, b) => Number(a.paid) - Number(b.paid));
             setAllOrders([...allOrderArr]);
+            setCompletedOrders([...completedOrderArr]);
           } else {
             error("Order not found ");
           }
         })
         .catch((error) => {
           error(error);
-        });
-    });
+        })
+    );
   };
+
+  tempGetAllOrders.current = getAllOrders;
 
   const orderSorting = (responseValue) => {
     if (USER.role === "Head") {
-      allOrderArr.push(responseValue);
+      taskSorting(responseValue);
     } else {
       if (responseValue.assigned_to === USER.role) {
-        allOrderArr.push(responseValue);
+        taskSorting(responseValue);
       }
       if (USER.role === "Client") {
         if (responseValue.client_id === USER.id) {
-          allOrderArr.push(responseValue);
+          taskSorting(responseValue);
         }
       }
+    }
+  };
+
+  const taskSorting = (responseValue) => {
+    if (responseValue.done) {
+      if (responseValue.paid) {
+        completedOrderArr.push(responseValue);
+      } else {
+        completedOrderArr.push(responseValue);
+      }
+    } else {
+      allOrderArr.push(responseValue);
     }
   };
 
@@ -78,6 +101,39 @@ export default function Orders() {
       .catch((error) => {
         error(error);
       });
+  };
+
+  const handleOrderCheck = async (index, id, done) => {
+    let array = allOrders;
+    array[index].done = !done;
+    console.log(array);
+    try {
+      const updateShop = await http.updateItem(
+        `order/${id}`,
+        { ...array[index] },
+        true
+      );
+      if (!updateShop.status === 200) throw error(updateShop.msg);
+      setAllOrders([...array]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleCompletedOrderCheck = async (index, id, done) => {
+    let array = completedOrders;
+    array[index].done = !done;
+    console.log(array);
+    try {
+      const updateShop = await http.updateItem(
+        `order/${id}`,
+        { ...array[index] },
+        true
+      );
+      if (!updateShop.status === 200) throw error(updateShop.msg);
+      setCompletedOrders([...array]);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const updateShop = (array) => {
@@ -104,11 +160,12 @@ export default function Orders() {
         {USER.role !== "Client" ? (
           <NavLink to="create">
             <button>
-              <FaPlus /> Add Order
+              <FiPlus />
             </button>
           </NavLink>
         ) : null}
       </Flexbox>
+      <h3>All Orders</h3>
       <table>
         <thead>
           <tr>
@@ -117,8 +174,9 @@ export default function Orders() {
             <th>Products Bought</th>
             <th>Assigned to</th>
             <th>Total Price</th>
-            <th>Recipt</th>
             <th>Paid</th>
+            <th>Recipt</th>
+            <th>Done</th>
             {USER.role && USER.role !== "Client" && <th>Action</th>}
           </tr>
         </thead>
@@ -129,42 +187,116 @@ export default function Orders() {
               <td>{obj.client_name}</td>
               <td>{obj.products_name}</td>
               <td>{obj.assigned_to}</td>
-              <td>{obj.total_price}</td>
               <td>
-                {obj.image != "" ? (
+                <StyledText colour={obj.paid ? null : "warning"}>
+                  {obj.total_price}
+                </StyledText>
+              </td>
+              <td>
+                <StyledText colour={obj.paid ? null : "danger"}>
+                  {obj.paid ? <FiThumbsUp /> : <FiThumbsDown />}
+                </StyledText>
+              </td>
+              <td>
+                {obj.image !== "" ? (
                   <img
                     src={process.env.REACT_APP_IMAGE_URL + obj.image}
                     width="200"
                     height="100"
                     onClick={() => {}}
+                    alt={obj.image}
                   />
                 ) : (
                   "NA"
                 )}
               </td>
-              <td>{obj.paid ? "yes" : "no"}</td>
+              <td>
+                <Toggle
+                  name="done"
+                  onValue={obj.done}
+                  handleClick={() => {
+                    handleOrderCheck(index, obj._id, obj.done);
+                  }}
+                />
+              </td>
+
               {USER.role && USER.role !== "Client" && (
                 <td>
-                  <Flexbox
-                    justify="flex-start"
-                    align="center"
-                    gap="1rem"
-                    padding="12pxc"
-                  >
-                    <NavLink to={`edit=${obj._id}`}>
-                      <Flexbox align="center">
-                        <FaPen></FaPen>
-                        <span>Edit</span>
-                      </Flexbox>
-                    </NavLink>
-                    <ButtonDanger
-                      onClick={(event) => {
-                        return deleteItem(obj._id);
-                      }}
-                    >
-                      <FaTrash></FaTrash>
-                    </ButtonDanger>
-                  </Flexbox>
+                  <Action
+                    obj={obj}
+                    handleClick={() => {
+                      return deleteItem(obj._id);
+                    }}
+                  />
+                </td>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <h3>Orders Completed</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>S.N</th>
+            <th>Client Name</th>
+            <th>Products Bought</th>
+            <th>Assigned to</th>
+            <th>Total Price</th>
+            <th>Paid</th>
+            <th>Recipt</th>
+            <th>Done</th>
+            {USER.role && USER.role !== "Client" && <th>Action</th>}
+          </tr>
+        </thead>
+        <tbody>
+          {completedOrders.map((obj, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>{obj.client_name}</td>
+              <td>{obj.products_name}</td>
+              <td>{obj.assigned_to}</td>
+              <td>
+                <StyledText colour={obj.paid ? null : "warning"}>
+                  {obj.total_price}
+                </StyledText>
+              </td>
+              <td>
+                <StyledText colour={obj.paid ? null : "danger"}>
+                  {obj.paid ? <FiThumbsUp /> : <FiThumbsDown />}
+                </StyledText>
+              </td>
+              <td>
+                {obj.image !== "" ? (
+                  <img
+                    src={process.env.REACT_APP_IMAGE_URL + obj.image}
+                    width="200"
+                    height="100"
+                    onClick={() => {}}
+                    alt={obj.image}
+                  />
+                ) : (
+                  "NA"
+                )}
+              </td>
+              <td>
+                <Toggle
+                  name="done"
+                  onValue={obj.done}
+                  handleClick={() => {
+                    handleCompletedOrderCheck(index, obj._id, obj.done);
+                  }}
+                />
+              </td>
+
+              {USER.role && USER.role !== "Client" && (
+                <td>
+                  <Action
+                    obj={obj}
+                    handleClick={() => {
+                      return deleteItem(obj._id);
+                    }}
+                  />
                 </td>
               )}
             </tr>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Input } from "../../Inputs/inputs";
 import Toggle from "../../Inputs/Toggle";
@@ -14,6 +14,7 @@ import { success, error } from "../../../utils/utils";
 import { ButtonDanger } from "../../../Styles/Button";
 
 import { FiX } from "react-icons/fi";
+import { orderValidate, validate } from "../../../utils/validation";
 const commonFields = {
   client_name: "",
   client_id: "",
@@ -27,13 +28,15 @@ const commonFields = {
 
 export default function OrdersEdit() {
   const [orderValue, setOrderValue] = useState(commonFields);
-  const [orderValueError, orderUserValueError] = useState(commonFields);
+  const [orderValueError, setOrderValueError] = useState(commonFields);
   const [filesToUpload, setFilesToUpload] = useState();
   const [clients, setClients] = useState([]);
+  const [canSubmit, setCanSubmit] = useState(false);
+
   let clientNameArr = [];
 
   //Redux
-  const shop = useSelector((state) => state.office);
+  const SHOP = useSelector((state) => state.office);
 
   // React Router
   const navigate = useNavigate();
@@ -41,7 +44,10 @@ export default function OrdersEdit() {
 
   const http = new HttpClient();
 
-  useEffect(() => {
+  const tempGetAllClients = useRef();
+  const tempSubmitValue = useRef();
+
+  const getAllClients = () => {
     http
       .getItemById(`order/${param.id}`, true)
       .then((response) => {
@@ -53,11 +59,7 @@ export default function OrdersEdit() {
         error(error);
       });
 
-    getAllClients();
-  }, []);
-
-  const getAllClients = () => {
-    shop.client_id.map((obj) => {
+    SHOP.client_id.map((obj) =>
       http
         .getItemById(`user/${obj}`)
         .then((response) => {
@@ -72,20 +74,22 @@ export default function OrdersEdit() {
         })
         .catch((error) => {
           error(error);
-        });
-    });
+        })
+    );
   };
+
+  tempGetAllClients.current = getAllClients;
+
+  useEffect(() => {
+    tempGetAllClients.current();
+  }, []);
 
   const handleChange = (event) => {
     const { name, value, type, files } = event.target;
     if (type === "file") {
       let fileToUpload = [];
-      Object.keys(files).map((key) => {
-        fileToUpload.push(files[key]);
-      });
-      console.log(orderValue.old_image);
+      Object.keys(files).map((key) => fileToUpload.push(files[key]));
       if (!orderValue.old_image) {
-        console.log("old image updated " + orderValue.old_image);
         setOrderValue((prev) => {
           return { ...prev, old_image: prev.image, image: "" };
         });
@@ -94,7 +98,7 @@ export default function OrdersEdit() {
     } else {
       setOrderValue({ ...orderValue, [name]: value });
     }
-    orderUserValueError(validate(orderValue));
+    setOrderValueError(validate(orderValue));
   };
 
   const handleCheck = () => {
@@ -103,52 +107,40 @@ export default function OrdersEdit() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    orderUserValueError(validate(orderValue));
-    if (Object.keys(orderValueError).length === 0) {
+    setOrderValueError(orderValidate(orderValue));
+    setCanSubmit(true);
+  };
+
+  const submitValue = () => {
+    if (Object.keys(orderValueError).length === 0 && canSubmit) {
       updateForm();
-    } else {
-      error(
-        "Not Ready To UPload because ",
-        "user error=",
-        Object.keys(orderValueError).length
+    } else if (canSubmit) {
+      error("Some things are left!");
+      setCanSubmit(false);
+    }
+  };
+
+  tempSubmitValue.current = submitValue;
+
+  useEffect(() => {
+    tempSubmitValue.current();
+  }, [orderValueError]);
+
+  const updateForm = async () => {
+    try {
+      const update = await http.uploader(
+        orderValue,
+        filesToUpload,
+        "PUT",
+        `order/${param.id}`,
+        true
       );
-      error(orderValueError);
-    }
-  };
 
-  const validate = (values) => {
-    const errors = {};
-    if (!values.client_name) {
-      errors.client_name = "Client Name is required!";
+      success(update.data.msg);
+      navigate("/user/orders");
+    } catch (error) {
+      error(error.msg);
     }
-    if (!values.client_id) {
-      errors.client_id = "Choose a client";
-    }
-    if (!values.products_name) {
-      errors.products_name = "Please give a name to the product";
-    }
-    if (!values.assigned_to) {
-      errors.assigned_to = "Assign it to someone";
-    }
-
-    if (!values.total_price) {
-      errors.total_price = "Price is missing";
-    }
-
-    return errors;
-  };
-
-  const updateForm = () => {
-    http
-      .uploader(orderValue, filesToUpload, "PUT", `order/${param.id}`, true)
-      .then((response) => {
-        success(response.data.msg);
-        navigate("/user/orders");
-      })
-      .catch((error) => {
-        console.log("In upload Form func =" + error);
-        error(error);
-      });
   };
 
   const deleteImageFromDB = () => {
@@ -160,11 +152,9 @@ export default function OrdersEdit() {
   const deleteImageFromState = (index) => {
     let images = [...filesToUpload];
     images.splice(index, 1);
-    console.log(images);
-    setFilesToUpload((prev) => {
+    setFilesToUpload(() => {
       return images;
     });
-    console.log(filesToUpload);
   };
 
   return (
@@ -210,10 +200,13 @@ export default function OrdersEdit() {
             value={orderValue.assigned_to}
           >
             <option value="">---Assigned to--- </option>
-            <option value="Accountant">Accountant</option>
-            <option value="Designer">Designer</option>
-            <option value="Writer">Writer</option>
-            <option value="Writer">Staff</option>
+            {SHOP &&
+              SHOP.roles &&
+              SHOP.roles.map((role, index) => (
+                <option key={index} value={role}>
+                  {role}
+                </option>
+              ))}
           </select>
           <TextDanger>{orderValueError.assigned_to}</TextDanger>
           <Input
