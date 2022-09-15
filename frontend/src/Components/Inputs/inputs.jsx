@@ -22,3 +22,4 @@ export function Input({ name, label, type, required, handleChange, value }) {
     </InputStyle>
   );
 }
+
