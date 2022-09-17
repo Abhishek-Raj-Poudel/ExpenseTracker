@@ -100,7 +100,6 @@ function Register() {
   tempUploadForm.current = uploadForm;
 
   useEffect(() => {
-    // uploadForm();
     tempUploadForm.current();
   }, [userValueError, officeValueError]);
 

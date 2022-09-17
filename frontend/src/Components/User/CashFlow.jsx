@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { HttpClient } from "../../utils/httpClients";
 //redux
 import { useSelector } from "react-redux";
@@ -34,8 +34,10 @@ export default function CashFlow() {
   let [estimatedAmount, setEstimatedAmount] = useState(0);
 
   const http = new HttpClient();
+  const tempGetAllOrders = useRef();
+  const tempSetAllValue = useRef();
 
-  useEffect(() => {
+  const getAllOrders = () => {
     SHOP.order_id.map(async (obj) => {
       try {
         const response = await http.getItemById(`order/${obj}`);
@@ -51,11 +53,23 @@ export default function CashFlow() {
         console.log(error);
       }
     });
-  }, [SHOP]);
+  };
+
+  tempGetAllOrders.current = getAllOrders;
 
   useEffect(() => {
+    tempGetAllOrders.current();
+  }, [SHOP]);
+
+  const setAllValue = () => {
     setEstimatedAmount(amountEarned + amountPending);
     exportValue();
+  };
+
+  tempSetAllValue.current = setAllValue;
+
+  useEffect(() => {
+    tempSetAllValue.current();
   }, [allOrders]);
 
   const updateCashValue = (obj) => {
