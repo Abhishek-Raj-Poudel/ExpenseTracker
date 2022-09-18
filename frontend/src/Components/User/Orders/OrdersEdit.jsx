@@ -32,7 +32,7 @@ export default function OrdersEdit() {
   const [filesToUpload, setFilesToUpload] = useState();
   const [clients, setClients] = useState([]);
   const [canSubmit, setCanSubmit] = useState(false);
-
+  const IMAGE_URL = "https://test-api-chronoabi.herokuapp.com/assets/images/";
   let clientNameArr = [];
 
   //Redux
@@ -224,7 +224,7 @@ export default function OrdersEdit() {
             {orderValue && orderValue.image && (
               <div>
                 <img
-                  src={process.env.REACT_APP_IMAGE_URL + orderValue.image}
+                  src={IMAGE_URL + orderValue.image}
                   alt={orderValue.image}
                   width="200"
                   height="100"

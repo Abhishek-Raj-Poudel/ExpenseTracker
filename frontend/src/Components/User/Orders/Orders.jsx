@@ -18,6 +18,7 @@ export default function Orders() {
   // Redux
   const SHOP = useSelector((state) => state.office);
   const USER = useSelector((state) => state.user);
+  const IMAGE_URL = "https://test-api-chronoabi.herokuapp.com/assets/images/";
 
   const SHOP_ID = USER.shop_id;
 
@@ -200,7 +201,7 @@ export default function Orders() {
               <td>
                 {obj.image !== "" ? (
                   <img
-                    src={process.env.REACT_APP_IMAGE_URL + obj.image}
+                    src={IMAGE_URL + obj.image}
                     width="200"
                     height="100"
                     onClick={() => {}}
@@ -269,7 +270,7 @@ export default function Orders() {
               <td>
                 {obj.image !== "" ? (
                   <img
-                    src={process.env.REACT_APP_IMAGE_URL + obj.image}
+                    src={IMAGE_URL + obj.image}
                     width="200"
                     height="100"
                     onClick={() => {}}
