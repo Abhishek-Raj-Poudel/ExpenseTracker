@@ -1,11 +1,11 @@
 This is a office management system made with M.E.R.N stack. 
 
 ## Programs Used
-1. [[Node js]]
+1. Node js
 2. ExpressJs
 3. MongoDB 
 4. Reactjs
-5. [[Redux]]
+5. Redux
 
 ## Things Learned
 1. Build a REST API
